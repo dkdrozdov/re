@@ -1,8 +1,12 @@
 package parser.token;
 
-class Character implements Token {
+public class Literal implements Token {
     static final int priority = 0;
     String value = "";
+
+    public Literal(String v) {
+        value = v;
+    }
 
     public void apply() {
 
