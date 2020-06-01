@@ -1,0 +1,75 @@
+import java.util.*;
+
+enum TokenType {
+    star, lit, concat, alter
+}
+
+class TokenNode {
+    List<TokenNode> children = new ArrayList<TokenNode>();
+    TokenNode parent = null;
+    Token data = null;
+
+    TokenNode(Token t) {
+        data = t;
+    }
+
+    TokenNode(Token t, TokenNode p) {
+        data = t;
+        parent = p;
+    }
+
+    void setParent(TokenNode p) {
+        parent = p;
+    }
+
+    void addChildren(Token c) {
+        TokenNode childrenNode = new TokenNode(c);
+        children.add(childrenNode);
+        childrenNode.setParent(this);
+    }
+
+}
+
+class Token {
+    TokenType type;
+    String value;
+    int priority;
+
+    public Token(TokenType t, String v) {
+        type = t;
+        value = v;
+    }
+
+    public void apply() {
+
+    }
+}
+
+public class Regex {
+
+    static ArrayList<Token> parse(String s) {
+        ArrayList<Token> tokens = new ArrayList<Token>();
+        Token nextToken;
+        for (int i = 0; i < s.length(); i++) {
+            switch (s.charAt(i)) {
+                case '*': {
+                    nextToken = new Token(TokenType.star, "");
+                    break;
+                }
+                default: {
+                    nextToken = new Token(TokenType.lit, String.valueOf(s.charAt(i)));
+                }
+            }
+            tokens.add(nextToken);
+        }
+        return tokens;
+    }
+
+    public static void main(String[] args) {
+        ArrayList<Token> testtokens = parse("ab*");
+
+        // Scanner in = new Scanner(System.in);
+        // String s = in.nextLine();
+        // System.out.println("You entered string " + s);
+    }
+}
