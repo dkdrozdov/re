@@ -1,4 +1,4 @@
-package parser.token;
+package parser.treebuilder;
 
 import java.util.*;
 
