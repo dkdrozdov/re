@@ -1,6 +1,4 @@
-package token;
-
-import java.util.*;
+package parser.token;
 
 public class Token {
     TokenType type;

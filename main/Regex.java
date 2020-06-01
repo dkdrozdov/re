@@ -1,8 +1,12 @@
+package main;
+
 import java.util.*;
+import parser.*;
+import parser.token.*;
 
 public class Regex {
     public static void main(String[] args) {
-        ArrayList<Token> testtokens = parse("ab*");
+        ArrayList<Token> testtokens = Parser.parse("ab*");
 
         // Scanner in = new Scanner(System.in);
         // String s = in.nextLine();

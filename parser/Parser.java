@@ -1,10 +1,11 @@
 package parser;
 
 import java.util.*;
-import token.*;
+
+import parser.token.*;
 
 public class Parser {
-    static ArrayList<Token> parse(String s) {
+    public static ArrayList<Token> parse(String s) {
         ArrayList<Token> tokens = new ArrayList<Token>();
         Token nextToken;
         for (int i = 0; i < s.length(); i++) {
