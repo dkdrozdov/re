@@ -6,7 +6,7 @@ import parser.token.*;
 
 public class Regex {
     public static void main(String[] args) {
-        ArrayList<Token> testtokens = Parser.parse("ab*");
+        ArrayList<Token> testTokens = Parser.parse("ab*");
 
         // Scanner in = new Scanner(System.in);
         // String s = in.nextLine();

@@ -11,6 +11,5 @@ public class Token {
     }
 
     public void apply() {
-
     }
 }
