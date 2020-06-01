@@ -1,15 +1,7 @@
 package parser.token;
 
-public class Token {
-    TokenType type;
-    String value;
-    int priority;
+public interface Token {
+    int priority = 0;
 
-    public Token(TokenType t, String v) {
-        type = t;
-        value = v;
-    }
-
-    public void apply() {
-    }
+    public void apply();
 }
