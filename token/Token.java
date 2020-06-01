@@ -2,11 +2,7 @@ package token;
 
 import java.util.*;
 
-enum TokenType {
-    star, lit, concat, alter
-}
-
-class Token {
+public class Token {
     TokenType type;
     String value;
     int priority;
