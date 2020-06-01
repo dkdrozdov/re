@@ -1,7 +1,6 @@
 package parser;
 
 import java.util.*;
-
 import parser.token.*;
 
 public class Parser {

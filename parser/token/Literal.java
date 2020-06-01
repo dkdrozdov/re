@@ -1,7 +1,7 @@
 package parser.token;
 
 public class Literal implements Token {
-    static final int priority = 0;
+    static final int priority = 4;
     String value = "";
 
     public Literal(String v) {
