@@ -6,7 +6,7 @@ public class Literal implements Token {
     @Override
     public int getPriority() {
 
-        return 4;
+        return TokenPrioritiy.LITERAL.toInt();
     }
 
     public Literal(String v) {
