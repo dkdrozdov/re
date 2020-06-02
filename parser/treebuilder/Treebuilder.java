@@ -22,20 +22,6 @@ public class Treebuilder {
                 highestPriorityTokenIndex = tokens.indexOf(token);
             }
         }
-        /*
-         * tokens.forEach(token -> { Token a = tokensIterator.next(); if
-         * (token.getPriority() > highestPriority) { highestPriority =
-         * token.getPriority(); highestPriorityTokenIndex = tokens.indexOf(token); } });
-         */
-        /*
-         * ArrayList<Integer> prioritizedTokensIndexes = new ArrayList<Integer>(); for
-         * (int i = 0; i < tokens.size(); i++) { prioritizedTokensIndexes.add(i); }
-         * 
-         * Collections.sort(prioritizedTokensIndexes, (Integer lhs, Integer rhs) ->
-         * tokens.get(lhs).getPriority() - tokens.get(rhs).getPriority());
-         * 
-         * int highestPriorityTokenIndex = prioritizedTokensIndexes.get(0);
-         */
 
         // Create a node out of first highest-priority token
         Node<Token> n = new Node<Token>(tokens.get(highestPriorityTokenIndex));
