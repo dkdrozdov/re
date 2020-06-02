@@ -13,6 +13,10 @@ public class Parser {
                     nextToken = new Asterisk();
                     break;
                 }
+                case '^': {
+                    nextToken = new Concat();
+                    break;
+                }
                 default: {
                     nextToken = new Literal(String.valueOf(s.charAt(i)));
                 }
