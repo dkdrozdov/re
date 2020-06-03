@@ -16,17 +16,17 @@ public class Node<T> {
         parent = p;
     }
 
-    void setParent(Node<T> p) {
+    public void setParent(Node<T> p) {
         parent = p;
     }
 
-    void addChild(T c) {
+    public void addChild(T c) {
         Node<T> childNode = new Node<T>(c);
         children.add(childNode);
         childNode.setParent(this);
     }
 
-    void addChild(Node<T> c) {
+    public void addChild(Node<T> c) {
         if (c != null) {
             children.add(c);
             c.setParent(this);
