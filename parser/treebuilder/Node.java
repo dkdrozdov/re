@@ -32,4 +32,16 @@ public class Node<T> {
             c.setParent(this);
         }
     }
+
+    public boolean ifLeaf() {
+        return (children.size() == 0);
+    }
+
+    public Node<T> getParent() {
+        return this.parent;
+    }
+
+    public List<Node<T>> getChildren() {
+        return this.children;
+    }
 }
