@@ -1,5 +1,9 @@
 package parser.token;
 
+import java.util.List;
+
+import nfa.StateTable;
+
 public class Concat implements Token {
     @Override
     public int getPriority() {
@@ -7,7 +11,9 @@ public class Concat implements Token {
         return TokenPriority.CONCAT.toInt();
     }
 
-    public void apply() {
-
+    public StateTable apply(List<StateTable> operands) {
+        StateTable table = operands.get(0);
+        table.concatenateStateTable(operands.get(1));
+        return table;
     }
 }

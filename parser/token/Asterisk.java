@@ -1,8 +1,23 @@
 package parser.token;
 
-public class Asterisk implements Token {
-    public void apply() {
+import java.util.List;
 
+import nfa.StateTable;
+
+public class Asterisk implements Token {
+    public StateTable apply(List<StateTable> operands) {
+        StateTable table = new StateTable(operands.get(0));
+        // int oldFinalState = table.getFinalState();
+        table.removeState(table.getFinalState());
+        table.replaceStateOnlyTable(table.getFinalState(), table.getStartState());
+        table.setFinalState(table.getStartState());
+        /*
+         * table.mergeStates(table.getStartState(), table.getFinalState());
+         * table.setFinalState(table.getStartState());
+         * table.concatenateStateTable(operands.get(0));
+         * table.setFinalState(table.getStartState());
+         */
+        return table;
     }
 
     @Override
