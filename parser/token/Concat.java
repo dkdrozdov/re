@@ -4,7 +4,7 @@ public class Concat implements Token {
     @Override
     public int getPriority() {
 
-        return TokenPrioritiy.CONCAT.toInt();
+        return TokenPriority.CONCAT.toInt();
     }
 
     public void apply() {

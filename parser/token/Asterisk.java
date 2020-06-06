@@ -7,6 +7,6 @@ public class Asterisk implements Token {
 
     @Override
     public int getPriority() {
-        return TokenPrioritiy.ASTERISK.toInt();
+        return TokenPriority.ASTERISK.toInt();
     }
 }

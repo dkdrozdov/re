@@ -1,9 +1,9 @@
 package parser.token;
 
-public enum TokenPrioritiy {
+public enum TokenPriority {
     LITERAL(1), ASTERISK(2), CONCAT(3);
 
-    TokenPrioritiy(int value) {
+    TokenPriority(int value) {
         this.value = value;
     }
 
