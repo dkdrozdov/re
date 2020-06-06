@@ -6,6 +6,20 @@
     "configurations": [
         {
             "type": "java",
+            "name": "CodeLens (Launch) - testremovelist",
+            "request": "launch",
+            "mainClass": "testremovelist",
+            "projectName": "java_re_project_2ce6fa8e"
+        },
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - test",
+            "request": "launch",
+            "mainClass": "test",
+            "projectName": "java_re_project_2ce6fa8e"
+        },
+        {
+            "type": "java",
             "name": "CodeLens (Launch) - Regex",
             "request": "launch",
             "mainClass": "main.Regex",
