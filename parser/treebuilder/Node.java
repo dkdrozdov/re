@@ -16,6 +16,10 @@ public class Node<T> {
         parent = p;
     }
 
+    public T getData() {
+        return data;
+    }
+
     public void setParent(Node<T> p) {
         parent = p;
     }
