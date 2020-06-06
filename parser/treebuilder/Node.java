@@ -48,4 +48,11 @@ public class Node<T> {
     public List<Node<T>> getChildren() {
         return this.children;
     }
+
+    public Node<T> findFirstLeaf() {
+        if (!ifLeaf()) {
+            return this.children.get(0).findFirstLeaf();
+        }
+        return this;
+    }
 }
