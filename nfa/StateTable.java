@@ -23,22 +23,45 @@ public class StateTable {
 
     public StateTable(StateTable table) {
         stateTable = new ArrayList<List<List<Integer>>>();
+        freeTransitions = new ArrayList<List<Integer>>();
         inputLits = new ArrayList<Character>();
         states = new ArrayList<Integer>();
 
-        table.stateTable.forEach(row -> {
+        for (int row = 0; row < table.stateTable.size(); row++) {
             this.stateTable.add(new ArrayList<List<Integer>>());
-            int indexOfRow = table.stateTable.indexOf(row);
-            // List<List<Integer>> currentRow = this.stateTable.get(indexOfRow);
-            row.forEach(transLit -> {
-                this.stateTable.get(indexOfRow).add(new ArrayList<Integer>());
-                int indexOfTranslit = table.stateTable.get(indexOfRow).indexOf(transLit);
-                transLit.forEach(transition -> {
-                    this.stateTable.get(indexOfRow).get(indexOfTranslit).add(transition);
-                });
-                // currentRow.set(indexOfTranslit, );
-            });
-        });
+            for (int transLit = 0; transLit < table.stateTable.get(row).size(); transLit++) {
+                this.stateTable.get(row).add(new ArrayList<Integer>());
+                for (int transition = 0; transition < table.stateTable.get(row).get(transLit).size(); transition++) {
+                    this.stateTable.get(row).get(transLit).add(table.stateTable.get(row).get(transLit).get(transition));
+                }
+            }
+        }
+        /*
+         * table.stateTable.forEach(row -> { this.stateTable.add(new
+         * ArrayList<List<Integer>>()); int indexOfRow = table.stateTable.indexOf(row);
+         * // List<List<Integer>> currentRow = this.stateTable.get(indexOfRow);
+         * row.forEach(transLit -> { this.stateTable.get(indexOfRow).add(new
+         * ArrayList<Integer>()); int indexOfTranslit =
+         * table.stateTable.get(indexOfRow).indexOf(transLit);
+         * transLit.forEach(transition -> {
+         * this.stateTable.get(indexOfRow).get(indexOfTranslit).add(transition); }); //
+         * currentRow.set(indexOfTranslit, ); }); });
+         */
+        for (int row = 0; row < table.freeTransitions.size(); row++) {
+            this.freeTransitions.add(new ArrayList<Integer>());
+            for (int transition = 0; transition < table.freeTransitions.get(row).size(); transition++) {
+                this.freeTransitions.get(row).add(table.freeTransitions.get(row).get(transition));
+            }
+
+        }
+        /*
+         * table.freeTransitions.forEach(row -> { this.freeTransitions.add(new
+         * ArrayList<Integer>()); int indexOfRow = table.freeTransitions.indexOf(row);
+         * // List<List<Integer>> currentRow = this.freeTransitions.get(indexOfRow);
+         * row.forEach(transition -> {
+         * this.freeTransitions.get(indexOfRow).add(transition); //
+         * currentRow.set(indexOfTranslit, ); }); });
+         */
         table.inputLits.forEach(lit -> {
             this.inputLits.add(lit);
         });
