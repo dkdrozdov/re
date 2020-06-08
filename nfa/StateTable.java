@@ -4,6 +4,7 @@ import java.util.*;
 
 public class StateTable {
     List<List<List<Integer>>> stateTable = null;
+    List<List<Integer>> freeTransitions = null;
     List<Character> inputLits = null;
     public List<Integer> states = null;
     int startState;
@@ -11,6 +12,7 @@ public class StateTable {
 
     public StateTable() {
         stateTable = new ArrayList<List<List<Integer>>>();
+        freeTransitions = new ArrayList<List<Integer>>();
         inputLits = new ArrayList<Character>();
         states = new ArrayList<Integer>();
         startState = addState();
@@ -118,6 +120,7 @@ public class StateTable {
     public int addState() {
         // Add new row of ints in the bottom of the table
         stateTable.add(new ArrayList<List<Integer>>());
+        freeTransitions.add(new ArrayList<Integer>());
         states.add(generateStateIndex());
         for (int i = 0; i < this.inputLits.size(); i++) {
             stateTable.get(states.size() - 1).add(new ArrayList<Integer>());
@@ -129,6 +132,7 @@ public class StateTable {
     public int addState(int state) {
         // Add new row of ints in the bottom of the table
         stateTable.add(new ArrayList<List<Integer>>());
+        freeTransitions.add(new ArrayList<Integer>());
         states.add(state);
         for (int i = 0; i < this.inputLits.size(); i++) {
             stateTable.get(states.size() - 1).add(new ArrayList<Integer>());
@@ -158,6 +162,13 @@ public class StateTable {
                 });
             });
         });
+        freeTransitions.forEach(row -> {
+            row.forEach(transition -> {
+                if (transition == oldIndex) {
+                    freeTransitions.get(freeTransitions.indexOf(row)).set(row.indexOf(transition), newIndex);
+                }
+            });
+        });
         /*
          * Iterator<List<List<Integer>>> tableRowIterator = stateTable.iterator();
          * Iterator<List<Integer>> tableColumnIterator = null; List<Integer>
@@ -182,16 +193,17 @@ public class StateTable {
             states.set(i, states.get(i) + n);
         }
         // increase each element in this.table
-        /* // (except elements with special value -1) - obsolete */
         for (int i = 0; i < stateTable.size(); i++) {
             for (int j = 0; j < stateTable.get(i).size(); j++) {
                 for (int t = 0; t < stateTable.get(i).get(j).size(); t++) {
                     stateTable.get(i).get(j).set(t, stateTable.get(i).get(j).get(t) + n);
                 }
-                /*
-                 * if (stateTable.get(i).get(j) != -1) { stateTable.get(i).set(j,
-                 * stateTable.get(i).get(j) + n); }
-                 */
+            }
+        }
+        // increase each element in this.freeTransitions
+        for (int i = 0; i < freeTransitions.size(); i++) {
+            for (int j = 0; j < freeTransitions.get(i).size(); j++) {
+                freeTransitions.get(i).set(j, freeTransitions.get(i).get(j) + n);
             }
         }
         // increase startState
@@ -244,20 +256,39 @@ public class StateTable {
         });
         // concatenate stateTable rows
         this.stateTable.addAll(correctedTable.stateTable);
+        this.freeTransitions.addAll(correctedTable.freeTransitions);
         // concatenate states
         this.states.addAll(correctedTable.states);
         // this.startState remains
-        // merge finalState with old startState //
-        mergeStates(this.getFinalState(), correctedTable.getStartState());
-        // set new finalState
+        // merge old finalState with old startState //
+        int oldFinalState = this.finalState;
         this.finalState = correctedTable.getFinalState();
-
+        mergeStates(oldFinalState, correctedTable.getStartState());
+        // resolve avalible freeTransitions
+        resolveFreeTransitions();
     }
 
-    public void mergeStates(int state1, int state2) {
-        // 1. remember index of state2 in states list
+    private void resolveFreeTransitions() {
+        // find a free transition
+        freeTransitions.forEach(row -> {
+            row.forEach(transition -> {
+                // find all free transitions with same destination
+                List<Integer> sameTransitionIndexes = new ArrayList<Integer>();
+                freeTransitions.forEach(transitionList -> {
+                    if (transitionList.contains(transition)) {
+                        // add their index in the sameTransitionIndexes list
+                        sameTransitionIndexes.add(freeTransitions.indexOf(transitionList));
+                    }
+                });
+                // copy foresaid destination's transitions into found transition's
+                sameTransitionIndexes.forEach(transitionIndex -> {
+                    copyTransitions(states.indexOf(transitionIndex), transition);
+                });
+            });
+        });
+    }
 
-        // 2. add every transition from state2 to state1, excluding duplicates
+    public void copyTransitions(int state1, int state2) {
         int indexOfState1 = this.states.indexOf(state1);
         List<List<Integer>> rowState1 = this.stateTable.get(indexOfState1);
         int indexOfState2 = this.states.indexOf(state2);
@@ -270,12 +301,31 @@ public class StateTable {
                 }
             });
         });
-        // 3. remove state2 from table and state list
-        this.stateTable.remove(this.states.indexOf(state2));
-        this.states.remove(this.states.indexOf(state2));
-        // 4. replace state2 with state1
-        this.replaceStateOnlyTable(state2, state1);
 
+    }
+
+    public void copyFreeTransitions(int state1, int state2) {
+        int indexOfState1 = this.states.indexOf(state1);
+        int indexOfState2 = this.states.indexOf(state2);
+        freeTransitions.get(indexOfState2).forEach(transition -> {
+            if (!freeTransitions.get(indexOfState1).contains(transition)) {
+                freeTransitions.get(indexOfState1).add(transition);
+            }
+        });
+    }
+
+    public void mergeStates(int state1, int state2) {
+        copyTransitions(state1, state2);
+        copyFreeTransitions(state1, state2);
+        removeState(state2);
+        replaceStateOnlyTable(state2, state1);
+        // carry over start/final state status
+        if (startState == state2) {
+            startState = state1;
+        }
+        if (finalState == state2) {
+            finalState = state1;
+        }
     }
 
     public void setFinalState(int state) {
@@ -284,6 +334,11 @@ public class StateTable {
 
     public void removeState(int state) {
         this.stateTable.remove(states.indexOf(state));
+        this.freeTransitions.remove(states.indexOf(state));
         this.states.remove(state);
+    }
+
+    public void addFreeTransition(int State1, int State2) {
+        freeTransitions.get(states.indexOf(State1)).add(State2);
     }
 }
