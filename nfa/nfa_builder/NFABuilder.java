@@ -4,10 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import nfa.StateTable;
-import parser.token.Literal;
 import parser.token.Token;
 import parser.treebuilder.Node;
-import parser.token.TokenPriority;
 
 public class NFABuilder {
     public static StateTable buildNFA(Node<Token> tree) {

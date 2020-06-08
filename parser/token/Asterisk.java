@@ -8,9 +8,14 @@ public class Asterisk implements Token {
     public StateTable apply(List<StateTable> operands) {
         StateTable table = new StateTable(operands.get(0));
         // int oldFinalState = table.getFinalState();
-        table.removeState(table.getFinalState());
-        table.replaceStateOnlyTable(table.getFinalState(), table.getStartState());
-        table.setFinalState(table.getStartState());
+        int metaFinal = table.getFinalState();
+        table.concatenateStateTable(operands.get(0));
+        // table.removeState(table.getFinalState());
+        table.replaceStateOnlyTable(table.getFinalState(), metaFinal);
+        table.addFreeTransition(metaFinal, table.getFinalState());
+        table.addFreeTransition(table.getStartState(), table.getFinalState());
+
+        // table.setFinalState(table.getStartState());
         /*
          * table.mergeStates(table.getStartState(), table.getFinalState());
          * table.setFinalState(table.getStartState());
