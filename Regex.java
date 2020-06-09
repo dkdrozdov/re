@@ -16,6 +16,6 @@ public class Regex {
     }
 
     public static void main(String[] args) {
-        StateTable testTable = buildFA("c^b*");
+        StateTable testTable = buildFA("a^b^c*^a*^c^b*");
     }
 }
