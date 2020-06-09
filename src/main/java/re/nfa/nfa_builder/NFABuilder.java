@@ -1,11 +1,11 @@
-package nfa.nfa_builder;
+package re.nfa.nfa_builder;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import nfa.StateTable;
-import parser.token.Token;
-import parser.treebuilder.Node;
+import re.nfa.StateTable;
+import re.parser.token.Token;
+import re.parser.treebuilder.Node;
 
 public class NFABuilder {
     public static StateTable buildNFA(Node<Token> tree) {

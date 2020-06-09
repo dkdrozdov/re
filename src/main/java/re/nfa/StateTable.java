@@ -1,4 +1,4 @@
-package nfa;
+package re.nfa;
 
 import java.util.*;
 

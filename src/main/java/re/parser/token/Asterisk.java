@@ -1,8 +1,8 @@
-package parser.token;
+package re.parser.token;
 
 import java.util.List;
 
-import nfa.StateTable;
+import re.nfa.StateTable;
 
 public class Asterisk implements Token {
     public StateTable apply(List<StateTable> operands) {

@@ -1,7 +1,7 @@
-package parser.treebuilder;
+package re.parser.treebuilder;
 
 import java.util.*;
-import parser.token.Token;
+import re.parser.token.Token;
 
 public class Treebuilder {
 

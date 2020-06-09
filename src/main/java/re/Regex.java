@@ -1,10 +1,11 @@
-import java.util.List;
+package re;
 
-import nfa.StateTable;
-import nfa.nfa_builder.NFABuilder;
-import parser.*;
-import parser.token.Token;
-import parser.treebuilder.*;
+import java.util.List;
+import re.nfa.StateTable;
+import re.nfa.nfa_builder.NFABuilder;
+import re.parser.*;
+import re.parser.token.Token;
+import re.parser.treebuilder.*;
 
 public class Regex {
 

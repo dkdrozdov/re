@@ -1,4 +1,4 @@
-package parser.token;
+package re.parser.token;
 
 public enum TokenPriority {
     LITERAL(1), ASTERISK(2), CONCAT(3);

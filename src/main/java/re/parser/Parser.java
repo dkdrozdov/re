@@ -1,7 +1,7 @@
-package parser;
+package re.parser;
 
 import java.util.*;
-import parser.token.*;
+import re.parser.token.*;
 
 public class Parser {
     public static ArrayList<Token> parse(String s) {
