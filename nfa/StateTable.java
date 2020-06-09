@@ -5,14 +5,14 @@ import java.util.*;
 public class StateTable {
     List<List<List<Integer>>> stateTable = null;
     List<List<Integer>> freeTransitions = null;
-    List<Character> inputLits = null;
+    List<String> inputLits = null;
     int startState;
     int finalState;
 
     public StateTable() {
         stateTable = new ArrayList<List<List<Integer>>>();
         freeTransitions = new ArrayList<List<Integer>>();
-        inputLits = new ArrayList<Character>();
+        inputLits = new ArrayList<String>();
         startState = addState();
         finalState = addState();
     }
@@ -24,7 +24,7 @@ public class StateTable {
     public StateTable(StateTable table) {
         stateTable = new ArrayList<List<List<Integer>>>();
         freeTransitions = new ArrayList<List<Integer>>();
-        inputLits = new ArrayList<Character>();
+        inputLits = new ArrayList<String>();
 
         for (int row = 0; row < table.stateTable.size(); row++) {
             this.stateTable.add(new ArrayList<List<Integer>>());
@@ -53,12 +53,12 @@ public class StateTable {
         return startState;
     }
 
-    public void addTransition(char transitionLit, int fromState, int toState) {
+    public void addTransition(String transitionLit, int fromState, int toState) {
         int indexOfTransition = inputLits.indexOf(transitionLit);
         stateTable.get(fromState).get(indexOfTransition).add(toState);
     }
 
-    public int addFinalState(int fromState, char transitionLit) {
+    public int addFinalState(int fromState, String transitionLit) {
         int newState = addState();
         addTransition(transitionLit, fromState, newState);
         return newState;
@@ -75,7 +75,7 @@ public class StateTable {
         return stateTable.size() - 1;
     }
 
-    public void addInputLit(char newLit) {
+    public void addInputLit(String newLit) {
         // Add new column of ints to the right of the table
         // (adds new element to each of states list elements)
         Iterator<List<List<Integer>>> stateTableIterator = stateTable.iterator();
@@ -139,12 +139,12 @@ public class StateTable {
 
     private void swapColumns(int index1, int index2) {
         // swap in inputLits
-        char tempLit = this.inputLits.get(index1);
-        this.inputLits.set(index1, this.inputLits.get(index2));
-        this.inputLits.set(index2, tempLit);
+        String tempLit = inputLits.get(index1);
+        inputLits.set(index1, inputLits.get(index2));
+        inputLits.set(index2, tempLit);
 
         // swap in table
-        this.stateTable.forEach(row -> {
+        stateTable.forEach(row -> {
             List<Integer> tempTransition = row.get(index1);
             row.set(index1, row.get(index2));
             row.set(index2, tempTransition);
@@ -171,7 +171,7 @@ public class StateTable {
         // this.stateTable
         int lit = 0;
         while (lit < this.inputLits.size()) {
-            while (correctedTable.inputLits.get(lit) != this.inputLits.get(lit)) {
+            while (!correctedTable.inputLits.get(lit).equals(this.inputLits.get(lit))) {
                 correctedTable.swapColumns(lit, correctedTable.inputLits.indexOf(this.inputLits.get(lit)));
             }
             lit++;
