@@ -4,14 +4,12 @@ import java.util.*;
 
 public class StateTable {
     List<List<List<Integer>>> stateTable = null;
-    List<List<Integer>> freeTransitions = null;
     List<String> inputLits = null;
     int startState;
     int finalState;
 
     public StateTable() {
         stateTable = new ArrayList<List<List<Integer>>>();
-        freeTransitions = new ArrayList<List<Integer>>();
         inputLits = new ArrayList<String>();
         startState = addState();
         finalState = addState();
@@ -23,7 +21,6 @@ public class StateTable {
 
     public StateTable(StateTable table) {
         stateTable = new ArrayList<List<List<Integer>>>();
-        freeTransitions = new ArrayList<List<Integer>>();
         inputLits = new ArrayList<String>();
 
         for (int row = 0; row < table.stateTable.size(); row++) {
@@ -34,13 +31,6 @@ public class StateTable {
                     this.stateTable.get(row).get(transLit).add(table.stateTable.get(row).get(transLit).get(transition));
                 }
             }
-        }
-        for (int row = 0; row < table.freeTransitions.size(); row++) {
-            this.freeTransitions.add(new ArrayList<Integer>());
-            for (int transition = 0; transition < table.freeTransitions.get(row).size(); transition++) {
-                this.freeTransitions.get(row).add(table.freeTransitions.get(row).get(transition));
-            }
-
         }
         table.inputLits.forEach(lit -> {
             this.inputLits.add(lit);
@@ -67,7 +57,6 @@ public class StateTable {
     public int addState() {
         // Add new row of ints in the bottom of the table
         stateTable.add(new ArrayList<List<Integer>>());
-        freeTransitions.add(new ArrayList<Integer>());
         for (int i = 0; i < this.inputLits.size(); i++) {
             stateTable.get(stateTable.size() - 1).add(new ArrayList<Integer>());
         }
@@ -96,14 +85,6 @@ public class StateTable {
                 }
             }
         }
-        for (int row = 0; row < freeTransitions.size(); row++) {
-            for (int transition = 0; transition < freeTransitions.get(row).size(); transition++) {
-                if (freeTransitions.get(row).get(transition) == oldIndex) {
-                    freeTransitions.get(row).set(transition, newIndex);
-                }
-
-            }
-        }
     }
 
     public void replaceStateIndex(int oldIndex, int newIndex) {
@@ -123,12 +104,6 @@ public class StateTable {
                 for (int t = 0; t < stateTable.get(i).get(j).size(); t++) {
                     stateTable.get(i).get(j).set(t, stateTable.get(i).get(j).get(t) + n);
                 }
-            }
-        }
-        // increase each element in this.freeTransitions
-        for (int i = 0; i < freeTransitions.size(); i++) {
-            for (int j = 0; j < freeTransitions.get(i).size(); j++) {
-                freeTransitions.get(i).set(j, freeTransitions.get(i).get(j) + n);
             }
         }
         // increase startState
@@ -184,7 +159,6 @@ public class StateTable {
          */
         // concatenate stateTable rows
         this.stateTable.addAll(correctedTable.stateTable);
-        this.freeTransitions.addAll(correctedTable.freeTransitions);
         // this.startState remains
         // merge old finalState with old startState //
         int oldFinalState = this.finalState;
@@ -195,17 +169,26 @@ public class StateTable {
     }
 
     private void resolveFreeTransitions() {
+        int freeTransitionLitIndex = inputLits.indexOf(SpecialTransitions.freeTransition);
+        // check if there's even a free-transition literal in list
+        if (freeTransitionLitIndex == -1) {
+            return;
+        }
         // find a free transition
-        for (int row = 0; row < freeTransitions.size(); row++) {
-            for (int transition = 0; transition < freeTransitions.get(row).size(); transition++) {
+        for (int row = 0; row < stateTable.size(); row++) {
+            for (int transition = 0; transition < stateTable.get(row).get(freeTransitionLitIndex)
+                    .size(); transition++) {
                 // find all free transitions with same destination
-                int destinationState = freeTransitions.get(row).get(transition);
+                int destinationState = stateTable.get(row).get(freeTransitionLitIndex).get(transition);
                 if (stateHasAnyTransitions(destinationState)) {
                     List<Integer> sameTransitionIndexes = new ArrayList<Integer>();
-                    for (int transitionList = 0; transitionList < freeTransitions.size(); transitionList++) {
-                        if (freeTransitions.get(transitionList).contains(destinationState)) {
-                            // add their index in the sameTransitionIndexes list
-                            sameTransitionIndexes.add(transitionList);
+                    for (int transitionList = 0; transitionList < stateTable.size(); transitionList++) {
+                        for (int freeTrans = 0; freeTrans < stateTable.get(row).get(freeTransitionLitIndex)
+                                .size(); freeTrans++) {
+                            if (stateTable.get(transitionList).get(freeTransitionLitIndex).contains(destinationState)) {
+                                // add their index in the sameTransitionIndexes list
+                                sameTransitionIndexes.add(transitionList);
+                            }
                         }
                     }
                     // copy foresaid destination's transitions into found transition's states
@@ -215,7 +198,8 @@ public class StateTable {
                     // remove resolved free transitions
                     for (int transitionIndex = sameTransitionIndexes.size()
                             - 1; transitionIndex >= 0; transitionIndex--) {
-                        freeTransitions.get(sameTransitionIndexes.get(transitionIndex)).remove(transition);
+                        stateTable.get(sameTransitionIndexes.get(transitionIndex)).get(freeTransitionLitIndex)
+                                .remove(transition);
                     }
                     // remove destination state
                     removeState(destinationState);
@@ -223,6 +207,7 @@ public class StateTable {
                 }
             }
         }
+
     }
 
     public boolean stateHasAnyTransitions(int state) {
@@ -253,17 +238,8 @@ public class StateTable {
          */
     }
 
-    public void copyFreeTransitions(int state1, int state2) {
-        freeTransitions.get(state2).forEach(transition -> {
-            if (!freeTransitions.get(state1).contains(transition)) {
-                freeTransitions.get(state1).add(transition);
-            }
-        });
-    }
-
     public void mergeStates(int state1, int state2) {
         copyTransitions(state1, state2);
-        copyFreeTransitions(state1, state2);
         replaceStateIndex(state2, state1);
         removeState(state2);
     }
@@ -277,10 +253,14 @@ public class StateTable {
             replaceStateIndex(s, s - 1);
         }
         stateTable.remove(state);
-        freeTransitions.remove(state);
     }
 
-    public void addFreeTransition(int state1, int state2) {
-        freeTransitions.get(state1).add(state2);
+    public void addFreeTransition(int fromState, int toState) {
+        if (!inputLits.contains(SpecialTransitions.freeTransition)) {
+            addInputLit(SpecialTransitions.freeTransition);
+        }
+        if (!stateTable.get(fromState).get(inputLits.indexOf(SpecialTransitions.freeTransition)).contains(toState)) {
+            stateTable.get(fromState).get(inputLits.indexOf(SpecialTransitions.freeTransition)).add(toState);
+        }
     }
 }

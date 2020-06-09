@@ -14,14 +14,6 @@ public class Asterisk implements Token {
         table.replaceStateOnlyTable(table.getFinalState(), metaFinal);
         table.addFreeTransition(metaFinal, table.getFinalState());
         table.addFreeTransition(table.getStartState(), table.getFinalState());
-
-        // table.setFinalState(table.getStartState());
-        /*
-         * table.mergeStates(table.getStartState(), table.getFinalState());
-         * table.setFinalState(table.getStartState());
-         * table.concatenateStateTable(operands.get(0));
-         * table.setFinalState(table.getStartState());
-         */
         return table;
     }
 
