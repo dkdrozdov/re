@@ -3,8 +3,8 @@ package re.fa;
 import java.util.*;
 
 public class StateTable {
-    List<List<List<Integer>>> stateTable = null;
-    List<String> inputLits = null;
+    public List<List<List<Integer>>> stateTable = null;
+    public List<String> inputLits = null;
     int startState;
     int finalState;
 
