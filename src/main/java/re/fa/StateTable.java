@@ -160,12 +160,6 @@ public class StateTable {
             }
             lit++;
         }
-        /*
-         * this.inputLits.forEach(lit -> { while
-         * (correctedTable.inputLits.get(this.inputLits.indexOf(lit)) != lit) { int
-         * litIndex = correctedTable.inputLits.indexOf(lit);
-         * correctedTable.swapColumns(this.inputLits.indexOf(lit), litIndex); } });
-         */
         // concatenate stateTable rows
         this.stateTable.addAll(correctedTable.stateTable);
         // this.startState remains
@@ -240,11 +234,6 @@ public class StateTable {
                 }
             }
         }
-        /*
-         * rowState2.forEach(transLit -> { transLit.forEach(transition -> { if
-         * (!rowState1.get(rowState2.indexOf(transLit)).contains(transition)) {
-         * rowState1.get(rowState2.indexOf(transLit)).add(transition); } }); });
-         */
     }
 
     public void mergeStates(int state1, int state2) {

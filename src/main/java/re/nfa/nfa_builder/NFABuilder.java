@@ -10,11 +10,6 @@ import re.parser.treebuilder.Node;
 public class NFABuilder {
     public static StateTable buildNFA(Node<Token> tree) {
         // StateTable table = new StateTable();
-        /*
-         * Node<Token> leaf = tree.findFirstLeaf(); try { if
-         * (leaf.getData().getPriority() != TokenPriority.LITERAL.toInt()) { throw new
-         * Exception("The leaf is not a literal"); } } catch (Exception e) { }
-         */
         if (tree.getChildren().size() == 0) {
             return tree.getData().apply(null);
         }
