@@ -1,4 +1,4 @@
-package re.nfa;
+package re.fa;
 
 import static org.junit.Assert.assertEquals;
 
@@ -52,6 +52,6 @@ public class StateTableTests {
         StateTable actualTable = new StateTable(table1);
         actualTable.concatenateStateTable(table2);
 
-        // assertEquals(expectedTable, actualTable);
-    }*/
+        assertEquals(expectedTable, actualTable);
+    }
 }
