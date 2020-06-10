@@ -1,7 +1,8 @@
 package re.parser.token;
 
 import java.util.List;
-import re.nfa.StateTable;
+
+import re.fa.StateTable;
 
 public interface Token {
     // static final int priority = 0;

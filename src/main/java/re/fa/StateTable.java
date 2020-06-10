@@ -1,6 +1,8 @@
-package re.nfa;
+package re.fa;
 
 import java.util.*;
+
+import re.nfa.SpecialTransitions;
 
 public class StateTable {
     List<List<List<Integer>>> stateTable = null;

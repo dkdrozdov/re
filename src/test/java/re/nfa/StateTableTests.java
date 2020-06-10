@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import re.fa.StateTable;
+
 public class StateTableTests {
     @Test
     public void concatenateStateTableTest() {
@@ -51,5 +53,5 @@ public class StateTableTests {
         actualTable.concatenateStateTable(table2);
 
         // assertEquals(expectedTable, actualTable);
-    }
+    }*/
 }

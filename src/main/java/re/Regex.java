@@ -1,7 +1,8 @@
 package re;
 
 import java.util.List;
-import re.nfa.StateTable;
+
+import re.fa.StateTable;
 import re.nfa.nfa_builder.NFABuilder;
 import re.parser.*;
 import re.parser.token.Token;

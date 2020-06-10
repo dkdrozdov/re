@@ -2,7 +2,7 @@ package re.parser.token;
 
 import java.util.List;
 
-import re.nfa.StateTable;
+import re.fa.StateTable;
 
 public class Literal implements Token {
     String value = "";

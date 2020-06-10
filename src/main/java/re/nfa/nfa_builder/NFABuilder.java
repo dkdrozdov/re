@@ -3,7 +3,7 @@ package re.nfa.nfa_builder;
 import java.util.ArrayList;
 import java.util.List;
 
-import re.nfa.StateTable;
+import re.fa.StateTable;
 import re.parser.token.Token;
 import re.parser.treebuilder.Node;
 
