@@ -31,6 +31,7 @@ public class DFAConverterTests {
         testTable.addFreeTransition(0, 2);
         testTable.addFreeTransition(2, 4);
         testTable.addFreeTransition(2, 6);
+        testTable.addFreeTransition(1, 2);
         // set up expectedList
         List<Integer> expectedList = new ArrayList<Integer>();
         expectedList.add(0);
