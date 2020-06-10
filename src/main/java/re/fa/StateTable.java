@@ -21,6 +21,15 @@ public class StateTable {
         return finalState;
     }
 
+    public boolean equals(Object obj) {
+        if (obj != null && getClass() == obj.getClass()) {
+            StateTable q = (StateTable) obj;
+            return this.startState == q.startState && this.finalState == q.finalState
+                    && this.stateTable.equals(q.stateTable) && this.inputLits.equals(q.inputLits);
+        }
+        return false;
+    }
+
     public StateTable(StateTable table) {
         stateTable = new ArrayList<List<List<Integer>>>();
         inputLits = new ArrayList<String>();
