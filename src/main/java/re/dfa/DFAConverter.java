@@ -20,8 +20,13 @@ public class DFAConverter {
         if (freeTransLitIndex != -1) {
             for (int freeTransition = 0; freeTransition < table.stateTable.get(startState).get(freeTransLitIndex)
                     .size(); freeTransition++) {
-                closureStates.addAll(buildEpsilonClosure(table,
-                        table.stateTable.get(startState).get(freeTransLitIndex).get(freeTransition)));
+                List<Integer> childStates = buildEpsilonClosure(table,
+                        table.stateTable.get(startState).get(freeTransLitIndex).get(freeTransition));
+                for (Integer state : childStates) {
+                    if (!closureStates.contains(state)) {
+                        closureStates.add(state);
+                    }
+                }
             }
         }
         return closureStates;
