@@ -53,6 +53,9 @@ public class StateTable {
     }
 
     public void addTransition(String transitionLit, int fromState, int toState) {
+        if (!inputLits.contains(transitionLit)) {
+            addInputLit(transitionLit);
+        }
         int indexOfTransition = inputLits.indexOf(transitionLit);
         stateTable.get(fromState).get(indexOfTransition).add(toState);
     }
