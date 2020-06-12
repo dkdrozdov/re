@@ -9,8 +9,32 @@ import re.fa.StateTable;
 public class DFAConverter {
     public static StateTable convertToDFA(StateTable table) {
         StateTable DFATable = eliminateNonDeterminism(table);
+        DFATable = removeDeadEnds(DFATable);
         return DFATable;
     }
+
+    public static StateTable removeDeadEnds(StateTable table) {
+        StateTable DFATable = new StateTable();
+        DFATable.removeState(1);
+        DFATable.removeState(0);
+
+        for (int state = 0; state < table.stateTable.size(); state++) {
+
+            if (stateLeadsToFinal(table, state)) {
+                DFATable.addState();
+                DFATable.copyTransitions(state, state, table);
+                if (state == table.getFinalState()) {
+                    DFATable.setFinalState(state);
+                }
+            }
+        }
+        return null;
+    }
+
+    public static boolean stateLeadsToFinal(StateTable table, int state) {
+        return false;
+    }
+
     public static StateTable eliminateNonDeterminism(StateTable table) {
         StateTable DFATable = new StateTable();
         DFATable.removeState(1);
@@ -133,14 +157,5 @@ public class DFAConverter {
             }
         }
         return closureStates;
-    }
-
-    public static StateTable eliminateNonDeterminism(StateTable table, int startState) {
-        List<Integer> states = new ArrayList<Integer>();
-        // add in states list startState and all states which startState lead to through
-        // free transition
-        states = buildEpsilonClosure(table, startState);
-
-        return null;
     }
 }
