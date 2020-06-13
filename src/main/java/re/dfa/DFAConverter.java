@@ -18,20 +18,37 @@ public class DFAConverter {
         DFATable.removeState(1);
         DFATable.removeState(0);
 
+    public static StateTable removeDeadEnds(StateTable table) {
+        List<Integer> deadEnds = new ArrayList<Integer>();
+        StateTable DFATable = new StateTable(table);
         for (int state = 0; state < table.stateTable.size(); state++) {
+            if (!stateLeadsToState(table, state, new ArrayList<Integer>(), table.getFinalState())) {
+                deadEnds.add(state);
+            }
+        }
+        for (int deadEnd = deadEnds.size() - 1; deadEnd >= 0; deadEnd--) {
+            DFATable.removeTransitionsToState(deadEnds.get(deadEnd));
+            DFATable.removeState(deadEnds.get(deadEnd));
+        }
+        return DFATable;
+    }
 
-            if (stateLeadsToFinal(table, state)) {
-                DFATable.addState();
-                DFATable.copyTransitions(state, state, table);
-                if (state == table.getFinalState()) {
-                    DFATable.setFinalState(state);
+    public static boolean stateLeadsToState(StateTable table, int state, List<Integer> marked, int destinationState) {
+        if (state == destinationState) {
+            return true;
+        }
+        for (int transLit = 0; transLit < table.stateTable.get(state).size(); transLit++) {
+            for (int transition : table.stateTable.get(state).get(transLit)) {
+                // int currentTransition =
+                // table.stateTable.get(state).get(transLit).get(transition);
+                if (!marked.contains(transition)) {
+                    marked.add(transition);
+                    if (stateLeadsToState(table, transition, marked, destinationState)) {
+                        return true;
                 }
             }
         }
-        return null;
     }
-
-    public static boolean stateLeadsToFinal(StateTable table, int state) {
         return false;
     }
 
