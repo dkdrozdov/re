@@ -10,6 +10,45 @@ import re.fa.StateTable;
 public class DFAConverterTests {
 
     @Test
+    public void removeUnobtainableTest() {
+        // set up test table
+        StateTable table = new StateTable();
+        table.removeState(1);
+        table.removeState(0);
+        for (int i = 0; i < 8; i++) {
+            table.addState();
+        }
+        table.addTransition("a", 0, 2);
+        table.addTransition("a", 1, 7);
+        table.addTransition("a", 1, 4);
+        table.addTransition("a", 1, 5);
+        table.addTransition("a", 2, 5);
+        table.addTransition("a", 3, 3);
+        table.addTransition("a", 3, 6);
+        table.addTransition("a", 4, 6);
+        table.addTransition("a", 5, 5);
+        table.addTransition("a", 5, 6);
+        table.addTransition("a", 6, 7);
+        table.setFinalState(7);
+        // set up expected table
+        StateTable expected = new StateTable();
+        expected.removeState(1);
+        expected.removeState(0);
+        for (int i = 0; i < 5; i++) {
+            expected.addState();
+        }
+        expected.addTransition("a", 0, 1);
+        expected.addTransition("a", 1, 2);
+        expected.addTransition("a", 2, 2);
+        expected.addTransition("a", 2, 3);
+        expected.addTransition("a", 3, 4);
+        expected.setFinalState(4);
+        // set up actual table
+        StateTable actual = DFAConverter.removeUnobtainable(table);
+        assertEquals(expected, actual);
+    }
+
+    @Test
     public void removeDeadEndsTest() {
         // set up test table
         StateTable table = new StateTable();
