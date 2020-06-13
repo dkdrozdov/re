@@ -264,4 +264,17 @@ public class StateTable {
             stateTable.get(fromState).get(inputLits.indexOf(SpecialTransitions.freeTransition)).add(toState);
         }
     }
+
+    public void removeTransitionsToState(int state) {
+        for (int row = 0; row < stateTable.size(); row++) {
+            for (int transLit = 0; transLit < stateTable.get(row).size(); transLit++) {
+                for (int transition = stateTable.get(row).get(transLit).size() - 1; transition >= 0; transition--) {
+                    if (stateTable.get(row).get(transLit).get(transition) == state) {
+                        stateTable.get(row).get(transLit).remove(transition);
+                    }
+                }
+            }
+        }
+    }
+
 }
