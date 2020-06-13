@@ -13,10 +13,20 @@ public class DFAConverter {
         return DFATable;
     }
 
-    public static StateTable removeDeadEnds(StateTable table) {
-        StateTable DFATable = new StateTable();
-        DFATable.removeState(1);
-        DFATable.removeState(0);
+    public static StateTable removeUnobtainable(StateTable table) {
+        List<Integer> unobtainable = new ArrayList<Integer>();
+        StateTable DFATable = new StateTable(table);
+        for (int state = 0; state < table.stateTable.size(); state++) {
+            if (!stateLeadsToState(table, table.getStartState(), new ArrayList<Integer>(), state)) {
+                unobtainable.add(state);
+            }
+        }
+        for (int unobtainableState = unobtainable.size() - 1; unobtainableState >= 0; unobtainableState--) {
+            DFATable.removeTransitionsToState(unobtainable.get(unobtainableState));
+            DFATable.removeState(unobtainable.get(unobtainableState));
+        }
+        return DFATable;
+    }
 
     public static StateTable removeDeadEnds(StateTable table) {
         List<Integer> deadEnds = new ArrayList<Integer>();
