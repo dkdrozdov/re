@@ -49,16 +49,14 @@ public class DFAConverter {
         }
         for (int transLit = 0; transLit < table.stateTable.get(state).size(); transLit++) {
             for (int transition : table.stateTable.get(state).get(transLit)) {
-                // int currentTransition =
-                // table.stateTable.get(state).get(transLit).get(transition);
                 if (!marked.contains(transition)) {
                     marked.add(transition);
                     if (stateLeadsToState(table, transition, marked, destinationState)) {
                         return true;
+                    }
                 }
             }
         }
-    }
         return false;
     }
 
