@@ -10,6 +10,48 @@ import re.fa.StateTable;
 public class DFAConverterTests {
 
     @Test
+    public void removeDeadEndsTest() {
+        // set up test table
+        StateTable table = new StateTable();
+        table.removeState(1);
+        table.removeState(0);
+        for (int i = 0; i < 11; i++) {
+            table.addState();
+        }
+        table.addTransition("a", 0, 1);
+        table.addTransition("a", 0, 2);
+        table.addTransition("a", 2, 4);
+        table.addTransition("a", 2, 5);
+        table.addTransition("a", 4, 4);
+        table.addTransition("a", 4, 5);
+        table.addTransition("a", 4, 7);
+        table.addTransition("a", 5, 5);
+        table.addTransition("a", 5, 9);
+        table.addTransition("a", 6, 10);
+        table.addTransition("a", 7, 10);
+        table.addTransition("a", 8, 7);
+        table.setFinalState(10);
+        // set up expected table
+        StateTable expected = new StateTable();
+        expected.removeState(1);
+        expected.removeState(0);
+        for (int i = 0; i < 7; i++) {
+            expected.addState();
+        }
+        expected.addTransition("a", 0, 1);
+        expected.addTransition("a", 1, 2);
+        expected.addTransition("a", 2, 2);
+        expected.addTransition("a", 2, 4);
+        expected.addTransition("a", 4, 6);
+        expected.addTransition("a", 5, 4);
+        expected.addTransition("a", 3, 6);
+        expected.setFinalState(6);
+        // set up actual table
+        StateTable actual = DFAConverter.removeDeadEnds(table);
+        assertEquals(expected, actual);
+    }
+
+    @Test
     public void eliminateNonDeterminismTest() {
         // set up test table
         StateTable table = new StateTable();
