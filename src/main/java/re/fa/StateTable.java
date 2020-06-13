@@ -277,4 +277,19 @@ public class StateTable {
         }
     }
 
+    public void copyTransitions(int state1, int state2, StateTable table) {
+        // List<List<Integer>> rowState1 = stateTable.get(state1);
+        List<List<Integer>> rowState2 = table.stateTable.get(state2);
+
+        for (int transLit = 0; transLit < rowState2.size(); transLit++) {
+            for (int transition = 0; transition < rowState2.get(transLit).size(); transition++) {
+                // if
+                // (!rowState1.get(transLit).contains(rowState2.get(transLit).get(transition)))
+                // {
+                addTransition(table.inputLits.get(transLit), state1, rowState2.get(transLit).get(transition));
+                // rowState1.get(transLit).add(rowState2.get(transLit).get(transition));
+                // }
+            }
+        }
+    }
 }
