@@ -177,7 +177,7 @@ public class StateTable {
         // resolveFreeTransitions();
     }
 
-    private void resolveFreeTransitions() {
+    public void resolveFreeTransitions() {
         int freeTransitionLitIndex = transitionLiterals.indexOf(SpecialTransitions.freeTransition);
         // check if there's even a free-transition literal in list
         if (freeTransitionLitIndex == -1) {
