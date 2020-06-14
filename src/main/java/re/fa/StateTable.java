@@ -174,7 +174,7 @@ public class StateTable {
         this.finalState = correctedTable.getFinalState();
         mergeStates(oldFinalState, correctedTable.getStartState());
         // resolve avalible freeTransitions
-        resolveFreeTransitions();
+        // resolveFreeTransitions();
     }
 
     private void resolveFreeTransitions() {
