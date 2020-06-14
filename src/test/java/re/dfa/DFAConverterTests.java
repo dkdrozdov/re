@@ -10,6 +10,56 @@ import re.fa.StateTable;
 public class DFAConverterTests {
 
     @Test
+    public void mergeEquivalentTest() {
+        // set up test table
+        StateTable table = new StateTable();
+        table.removeState(1);
+        table.removeState(0);
+        for (int i = 0; i < 11; i++) {
+            table.addState();
+        }
+        table.addTransition("a", 0, 1);
+        table.addTransition("b", 0, 2);
+        table.addTransition("c", 0, 3);
+        table.addTransition("d", 0, 4);
+        table.addTransition("a", 1, 5);
+        table.addTransition("a", 2, 5);
+        table.addTransition("b", 3, 6);
+        table.addTransition("b", 4, 6);
+        table.addTransition("a", 5, 5);
+        table.addTransition("b", 5, 7);
+        table.addTransition("a", 6, 5);
+        table.addTransition("b", 6, 7);
+        table.addTransition("b", 7, 8);
+        table.addTransition("a", 7, 9);
+        table.addTransition("a", 8, 10);
+        table.addTransition("a", 9, 10);
+        table.setFinalState(10);
+        // set up expected table
+        StateTable expected = new StateTable();
+        expected.removeState(1);
+        expected.removeState(0);
+        for (int i = 0; i < 6; i++) {
+            expected.addState();
+        }
+        expected.addTransition("a", 0, 1);
+        expected.addTransition("b", 0, 1);
+        expected.addTransition("c", 0, 1);
+        expected.addTransition("d", 0, 1);
+        expected.addTransition("a", 1, 2);
+        expected.addTransition("b", 1, 2);
+        expected.addTransition("a", 2, 2);
+        expected.addTransition("b", 2, 3);
+        expected.addTransition("a", 3, 4);
+        expected.addTransition("b", 3, 4);
+        expected.addTransition("a", 4, 5);
+        expected.setFinalState(5);
+        // set up actual table
+        StateTable actual = DFAConverter.mergeEquivalent(table);
+        assertEquals(expected, actual);
+    }
+
+    @Test
     public void removeUnobtainableTest() {
         // set up test table
         StateTable table = new StateTable();
