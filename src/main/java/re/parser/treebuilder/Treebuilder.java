@@ -1,7 +1,8 @@
 package re.parser.treebuilder;
 
 import java.util.*;
-import re.parser.token.Token;
+
+import re.parser.token.*;
 
 public class Treebuilder {
 
@@ -23,8 +24,12 @@ public class Treebuilder {
             }
         }
 
+        Token highestPriorityToken = tokens.get(highestPriorityTokenIndex);
         // Create a node out of first highest-priority token
-        Node<Token> n = new Node<Token>(tokens.get(highestPriorityTokenIndex));
+        Node<Token> n = new Node<Token>(highestPriorityToken);
+        if (highestPriorityToken.getType() == TokenType.CAPTURING_GROUP) {
+            n = buildTree(((CapturingGroup) highestPriorityToken).getTokens());
+        }
         // Launch this function recursive for part by left and right of first
         // highest-priority token of tokens list.
         n.addChild(buildTree(tokens.subList(0, highestPriorityTokenIndex)));
@@ -33,13 +38,4 @@ public class Treebuilder {
         return n;
     }
 
-    public static ArrayList<Token> structurizeTokens(ArrayList<Token> tokens) {
-        // 1. Insert concats
-        for (int i = 0; i < tokens.size(); i++) {
-
-        }
-
-        // 2. Insert tokens into each other
-        return null;
-    }
 }
