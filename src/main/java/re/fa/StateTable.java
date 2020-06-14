@@ -4,13 +4,13 @@ import java.util.*;
 
 public class StateTable {
     public List<List<List<Integer>>> stateTable = null;
-    public List<String> inputLits = null;
+    public List<String> transitionLiterals = null;
     int startState;
     int finalState;
 
     public StateTable() {
         stateTable = new ArrayList<List<List<Integer>>>();
-        inputLits = new ArrayList<String>();
+        transitionLiterals = new ArrayList<String>();
         startState = addState();
         finalState = addState();
     }
@@ -23,14 +23,14 @@ public class StateTable {
         if (obj != null && getClass() == obj.getClass()) {
             StateTable q = (StateTable) obj;
             return this.startState == q.startState && this.finalState == q.finalState
-                    && this.stateTable.equals(q.stateTable) && this.inputLits.equals(q.inputLits);
+                    && this.stateTable.equals(q.stateTable) && this.transitionLiterals.equals(q.transitionLiterals);
         }
         return false;
     }
 
     public StateTable(StateTable table) {
         stateTable = new ArrayList<List<List<Integer>>>();
-        inputLits = new ArrayList<String>();
+        transitionLiterals = new ArrayList<String>();
 
         for (int row = 0; row < table.stateTable.size(); row++) {
             this.stateTable.add(new ArrayList<List<Integer>>());
@@ -41,8 +41,8 @@ public class StateTable {
                 }
             }
         }
-        table.inputLits.forEach(lit -> {
-            this.inputLits.add(lit);
+        table.transitionLiterals.forEach(lit -> {
+            this.transitionLiterals.add(lit);
         });
         this.startState = table.getStartState();
         this.finalState = table.getFinalState();
@@ -53,10 +53,10 @@ public class StateTable {
     }
 
     public void addTransition(String transitionLit, int fromState, int toState) {
-        if (!inputLits.contains(transitionLit)) {
-            addInputLit(transitionLit);
+        if (!transitionLiterals.contains(transitionLit)) {
+            addTransitionLiteral(transitionLit);
         }
-        int indexOfTransition = inputLits.indexOf(transitionLit);
+        int indexOfTransition = transitionLiterals.indexOf(transitionLit);
         stateTable.get(fromState).get(indexOfTransition).add(toState);
     }
 
@@ -69,21 +69,21 @@ public class StateTable {
     public int addState() {
         // Add new row of ints in the bottom of the table
         stateTable.add(new ArrayList<List<Integer>>());
-        for (int i = 0; i < this.inputLits.size(); i++) {
+        for (int i = 0; i < this.transitionLiterals.size(); i++) {
             stateTable.get(stateTable.size() - 1).add(new ArrayList<Integer>());
         }
         // Return index of created state
         return stateTable.size() - 1;
     }
 
-    public void addInputLit(String newLit) {
+    public void addTransitionLiteral(String newLit) {
         // Add new column of ints to the right of the table
         // (adds new element to each of states list elements)
         Iterator<List<List<Integer>>> stateTableIterator = stateTable.iterator();
         while (stateTableIterator.hasNext()) {
             stateTableIterator.next().add(new ArrayList<Integer>());
         }
-        inputLits.add(newLit);
+        transitionLiterals.add(newLit);
     }
 
     public void replaceStateOnlyTable(int oldIndex, int newIndex) {
@@ -126,9 +126,9 @@ public class StateTable {
 
     private void swapColumns(int index1, int index2) {
         // swap in inputLits
-        String tempLit = inputLits.get(index1);
-        inputLits.set(index1, inputLits.get(index2));
-        inputLits.set(index2, tempLit);
+        String tempLit = transitionLiterals.get(index1);
+        transitionLiterals.set(index1, transitionLiterals.get(index2));
+        transitionLiterals.set(index2, tempLit);
 
         // swap in table
         stateTable.forEach(row -> {
@@ -143,23 +143,24 @@ public class StateTable {
         StateTable correctedTable = new StateTable(table);
         correctedTable.increaseStateIndexes(this.stateTable.size());
         // Add every missing lit from correctedTable to this
-        correctedTable.inputLits.forEach(lit -> {
-            if (!this.inputLits.contains(lit)) {
-                this.addInputLit(lit);
+        correctedTable.transitionLiterals.forEach(lit -> {
+            if (!this.transitionLiterals.contains(lit)) {
+                this.addTransitionLiteral(lit);
             }
         });
         // Add every missing lit from this to correctedTable
-        this.inputLits.forEach(lit -> {
-            if (!correctedTable.inputLits.contains(lit)) {
-                correctedTable.addInputLit(lit);
+        this.transitionLiterals.forEach(lit -> {
+            if (!correctedTable.transitionLiterals.contains(lit)) {
+                correctedTable.addTransitionLiteral(lit);
             }
         });
         // sort literal array and stateTable of correctedTable to correspond
         // this.stateTable
         int lit = 0;
-        while (lit < this.inputLits.size()) {
-            while (!correctedTable.inputLits.get(lit).equals(this.inputLits.get(lit))) {
-                correctedTable.swapColumns(lit, correctedTable.inputLits.indexOf(this.inputLits.get(lit)));
+        while (lit < this.transitionLiterals.size()) {
+            while (!correctedTable.transitionLiterals.get(lit).equals(this.transitionLiterals.get(lit))) {
+                correctedTable.swapColumns(lit,
+                        correctedTable.transitionLiterals.indexOf(this.transitionLiterals.get(lit)));
             }
             lit++;
         }
@@ -175,7 +176,7 @@ public class StateTable {
     }
 
     private void resolveFreeTransitions() {
-        int freeTransitionLitIndex = inputLits.indexOf(SpecialTransitions.freeTransition);
+        int freeTransitionLitIndex = transitionLiterals.indexOf(SpecialTransitions.freeTransition);
         // check if there's even a free-transition literal in list
         if (freeTransitionLitIndex == -1) {
             return;
@@ -257,11 +258,12 @@ public class StateTable {
     }
 
     public void addFreeTransition(int fromState, int toState) {
-        if (!inputLits.contains(SpecialTransitions.freeTransition)) {
-            addInputLit(SpecialTransitions.freeTransition);
+        if (!transitionLiterals.contains(SpecialTransitions.freeTransition)) {
+            addTransitionLiteral(SpecialTransitions.freeTransition);
         }
-        if (!stateTable.get(fromState).get(inputLits.indexOf(SpecialTransitions.freeTransition)).contains(toState)) {
-            stateTable.get(fromState).get(inputLits.indexOf(SpecialTransitions.freeTransition)).add(toState);
+        if (!stateTable.get(fromState).get(transitionLiterals.indexOf(SpecialTransitions.freeTransition))
+                .contains(toState)) {
+            stateTable.get(fromState).get(transitionLiterals.indexOf(SpecialTransitions.freeTransition)).add(toState);
         }
     }
 
@@ -286,7 +288,7 @@ public class StateTable {
                 // if
                 // (!rowState1.get(transLit).contains(rowState2.get(transLit).get(transition)))
                 // {
-                addTransition(table.inputLits.get(transLit), state1, rowState2.get(transLit).get(transition));
+                addTransition(table.transitionLiterals.get(transLit), state1, rowState2.get(transLit).get(transition));
                 // rowState1.get(transLit).add(rowState2.get(transLit).get(transition));
                 // }
             }

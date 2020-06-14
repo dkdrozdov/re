@@ -94,14 +94,14 @@ public class DFAConverterTests {
     public void eliminateNonDeterminismTest() {
         // set up test table
         StateTable table = new StateTable();
-        table.addInputLit("a");
-        table.addInputLit("b");
-        table.addInputLit("c");
-        table.addInputLit("0");
-        table.addInputLit("1");
-        table.addInputLit("2");
-        table.addInputLit("3");
-        table.addInputLit(".");
+        table.addTransitionLiteral("a");
+        table.addTransitionLiteral("b");
+        table.addTransitionLiteral("c");
+        table.addTransitionLiteral("0");
+        table.addTransitionLiteral("1");
+        table.addTransitionLiteral("2");
+        table.addTransitionLiteral("3");
+        table.addTransitionLiteral(".");
         for (int i = 0; i < 18; i++) {
             table.addState();
         }
@@ -145,15 +145,15 @@ public class DFAConverterTests {
         for (int i = 0; i < 11; i++) {
             expectedTable.addState();
         }
-        expectedTable.addInputLit("b");
+        expectedTable.addTransitionLiteral("b");
         expectedTable.addFreeTransition(2, 3);
-        expectedTable.addInputLit("a");
-        expectedTable.addInputLit("c");
-        expectedTable.addInputLit(".");
-        expectedTable.addInputLit("0");
-        expectedTable.addInputLit("1");
-        expectedTable.addInputLit("2");
-        expectedTable.addInputLit("3");
+        expectedTable.addTransitionLiteral("a");
+        expectedTable.addTransitionLiteral("c");
+        expectedTable.addTransitionLiteral(".");
+        expectedTable.addTransitionLiteral("0");
+        expectedTable.addTransitionLiteral("1");
+        expectedTable.addTransitionLiteral("2");
+        expectedTable.addTransitionLiteral("3");
         expectedTable.addTransition("a", 0, 1);
         expectedTable.addTransition("c", 0, 4);
         expectedTable.addTransition(".", 0, 11);
@@ -195,8 +195,8 @@ public class DFAConverterTests {
         testTable.addState();
         testTable.addState();
         testTable.setFinalState(testTable.stateTable.size() - 1);
-        testTable.addInputLit("a");
-        testTable.addInputLit("b");
+        testTable.addTransitionLiteral("a");
+        testTable.addTransitionLiteral("b");
         testTable.addTransition("a", 0, 4);
         testTable.addTransition("a", 0, 7);
         testTable.addTransition("a", 1, 5);

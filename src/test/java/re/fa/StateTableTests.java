@@ -11,9 +11,9 @@ public class StateTableTests {
         StateTable table1 = new StateTable();
         table1.addState();
         table1.finalState = table1.stateTable.size() - 1;
-        table1.addInputLit("a");
-        table1.addInputLit("b");
-        table1.addInputLit("c");
+        table1.addTransitionLiteral("a");
+        table1.addTransitionLiteral("b");
+        table1.addTransitionLiteral("c");
         table1.addTransition("a", 0, 1);
         table1.addTransition("b", 0, 2);
         table1.addTransition("c", 0, 1);
@@ -24,8 +24,8 @@ public class StateTableTests {
         StateTable table2 = new StateTable();
         table2.addState();
         table2.finalState = table2.stateTable.size() - 1;
-        table2.addInputLit("d");
-        table2.addInputLit("a");
+        table2.addTransitionLiteral("d");
+        table2.addTransitionLiteral("a");
         table2.addTransition("d", 0, 1);
         table2.addTransition("a", 1, 2);
         // set up expected table
@@ -34,10 +34,10 @@ public class StateTableTests {
         expectedTable.addState();
         expectedTable.addState();
         expectedTable.finalState = expectedTable.stateTable.size() - 1;
-        expectedTable.addInputLit("a");
-        expectedTable.addInputLit("b");
-        expectedTable.addInputLit("c");
-        expectedTable.addInputLit("d");
+        expectedTable.addTransitionLiteral("a");
+        expectedTable.addTransitionLiteral("b");
+        expectedTable.addTransitionLiteral("c");
+        expectedTable.addTransitionLiteral("d");
         expectedTable.addTransition("a", 0, 1);
         expectedTable.addTransition("a", 1, 2);
         expectedTable.addTransition("a", 3, 4);

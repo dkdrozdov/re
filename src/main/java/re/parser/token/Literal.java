@@ -23,7 +23,7 @@ public class Literal implements Token {
 
     public StateTable apply(List<StateTable> operands) {
         StateTable table = new StateTable();
-        table.addInputLit(value);
+        table.addTransitionLiteral(value);
         table.addTransition(value, table.getStartState(), table.getFinalState());
         return table;
     }

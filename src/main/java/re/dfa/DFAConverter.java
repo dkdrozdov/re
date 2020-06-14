@@ -110,7 +110,7 @@ public class DFAConverter {
             List<Integer> currentStates, String lit) {
         // 2.4 make set of destination states from currentStates by currentStateLits
         List<Integer> newStates = new ArrayList<Integer>();
-        int transLit = table.inputLits.indexOf(lit);
+        int transLit = table.transitionLiterals.indexOf(lit);
         for (int state : currentStates) {
             for (int transition : table.stateTable.get(state).get(transLit)) {
                 // exclude free non-final transitions
@@ -139,10 +139,10 @@ public class DFAConverter {
                     int currentTransition = table.stateTable.get(currentState).get(transLit).get(transition);
                     // if transition isn't free to non-final state
                     if (!(currentTransition != table.getFinalState()
-                            && table.inputLits.get(transLit) == SpecialTransitions.freeTransition)) {
+                            && table.transitionLiterals.get(transLit) == SpecialTransitions.freeTransition)) {
                         // exclude duplicates
-                        if (!currentStateLits.contains(table.inputLits.get(transLit))) {
-                            currentStateLits.add(table.inputLits.get(transLit));
+                        if (!currentStateLits.contains(table.transitionLiterals.get(transLit))) {
+                            currentStateLits.add(table.transitionLiterals.get(transLit));
                         }
                     }
                 }
@@ -168,7 +168,7 @@ public class DFAConverter {
     public static List<Integer> buildEpsilonClosure(StateTable table, int startState) {
         List<Integer> closureStates = new ArrayList<Integer>();
         closureStates.add(startState);
-        int freeTransLitIndex = table.inputLits.indexOf(SpecialTransitions.freeTransition);
+        int freeTransLitIndex = table.transitionLiterals.indexOf(SpecialTransitions.freeTransition);
         if (freeTransLitIndex != -1) {
             for (int freeTransition = 0; freeTransition < table.stateTable.get(startState).get(freeTransLitIndex)
                     .size(); freeTransition++) {
