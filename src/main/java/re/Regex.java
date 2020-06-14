@@ -22,7 +22,7 @@ public class Regex {
         return table;
     }
 
-    public static void main(String[] args) {
+    public static void ioInteractive() {
         Scanner in = new Scanner(System.in);
         // set up regex table
         System.out.print("Enter a regular expression: ");
@@ -50,5 +50,35 @@ public class Regex {
             string = in.nextLine();
         }
         in.close();
+    }
+
+    public static void ioStandard(String[] args) {
+        String regex = args[0];
+        StateTable table = buildFA(regex);
+        Scanner in = new Scanner(System.in);
+        String string = "";
+        String currentDecision = "";
+        while (in.hasNextLine()) {
+            string = in.nextLine();
+            AcceptorDecision decision = Acceptor.runStateTable(table, string);
+            switch (decision) {
+                case ACCEPT: {
+                    currentDecision = "ACCEPT";
+                    break;
+                }
+                case DENY: {
+                    currentDecision = "DENY";
+                    break;
+                }
+                default: {
+                }
+            }
+            System.out.println(currentDecision);
+        }
+        in.close();
+    }
+
+    public static void main(String[] args) {
+        ioStandard(args);
     }
 }
