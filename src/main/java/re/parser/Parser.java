@@ -9,6 +9,16 @@ public class Parser {
         Token nextToken;
         for (int i = 0; i < s.length(); i++) {
             switch (s.charAt(i)) {
+                case '(': {
+                    String passed = "";
+                    i++;
+                    while (s.charAt(i) != ')') {
+                        passed = passed.concat(String.valueOf(s.charAt(i)));
+                        i++;
+                    }
+                    nextToken = new CapturingGroup(parse(passed));
+                    break;
+                }
                 case '*': {
                     nextToken = new Asterisk();
                     break;
@@ -39,13 +49,29 @@ public class Parser {
                         if (initialTokens.get(i + 1).getType() == TokenType.LITERAL) {
                             tokens.add(new Concat());
                         }
+                        if (initialTokens.get(i + 1).getType() == TokenType.CAPTURING_GROUP) {
+                            tokens.add(new Concat());
+                        }
                         break;
                     }
                     case ASTERISK: {
                         if (initialTokens.get(i + 1).getType() == TokenType.LITERAL) {
                             tokens.add(new Concat());
                         }
+                        if (initialTokens.get(i + 1).getType() == TokenType.CAPTURING_GROUP) {
+                            tokens.add(new Concat());
+                        }
                         break;
+                    }
+                    case CAPTURING_GROUP: {
+                        if (initialTokens.get(i + 1).getType() == TokenType.LITERAL) {
+                            tokens.add(new Concat());
+                        }
+                        if (initialTokens.get(i + 1).getType() == TokenType.CAPTURING_GROUP) {
+                            tokens.add(new Concat());
+                        }
+                        break;
+
                     }
                     default: {
 
