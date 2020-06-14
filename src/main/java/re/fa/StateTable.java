@@ -7,6 +7,7 @@ public class StateTable {
     public List<String> transitionLiterals = null;
     int startState;
     int finalState;
+    int deadState;
 
     public StateTable() {
         stateTable = new ArrayList<List<List<Integer>>>();
@@ -22,7 +23,7 @@ public class StateTable {
     public boolean equals(Object obj) {
         if (obj != null && getClass() == obj.getClass()) {
             StateTable q = (StateTable) obj;
-            return this.startState == q.startState && this.finalState == q.finalState
+            return this.startState == q.startState && this.finalState == q.finalState && this.deadState == q.deadState
                     && this.stateTable.equals(q.stateTable) && this.transitionLiterals.equals(q.transitionLiterals);
         }
         return false;
@@ -46,6 +47,7 @@ public class StateTable {
         });
         this.startState = table.getStartState();
         this.finalState = table.getFinalState();
+        this.deadState = table.getDeadState();
     }
 
     public int getStartState() {
@@ -307,5 +309,13 @@ public class StateTable {
         }
 
         return destinations;
+    }
+
+    public void setDeadState(int state) {
+        deadState = state;
+    }
+
+    public int getDeadState() {
+        return deadState;
     }
 }
