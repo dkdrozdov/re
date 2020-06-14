@@ -9,6 +9,15 @@ public class Asterisk implements Token {
     public TokenType getType() {
         return TokenType.ASTERISK;
     }
+
+    public boolean equals(Object obj) {
+        if (obj != null && getClass() == obj.getClass()) {
+            Asterisk q = (Asterisk) obj;
+            return this.getType() == q.getType();
+        }
+        return false;
+    }
+
     public StateTable apply(List<StateTable> operands) {
         StateTable table = new StateTable(operands.get(0));
         // int oldFinalState = table.getFinalState();

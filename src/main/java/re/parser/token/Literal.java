@@ -12,6 +12,15 @@ public class Literal implements Token {
     public TokenType getType() {
         return TokenType.LITERAL;
     }
+
+    public boolean equals(Object obj) {
+        if (obj != null && getClass() == obj.getClass()) {
+            Literal q = (Literal) obj;
+            return this.value == q.value;
+        }
+        return false;
+    }
+
     @Override
     public int getPriority() {
 

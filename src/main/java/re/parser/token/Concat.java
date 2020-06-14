@@ -9,6 +9,15 @@ public class Concat implements Token {
     public TokenType getType() {
         return TokenType.CONCAT;
     }
+
+    public boolean equals(Object obj) {
+        if (obj != null && getClass() == obj.getClass()) {
+            Concat q = (Concat) obj;
+            return this.getType() == q.getType();
+        }
+        return false;
+    }
+
     @Override
     public int getPriority() {
 
