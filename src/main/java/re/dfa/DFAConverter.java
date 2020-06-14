@@ -9,9 +9,37 @@ import re.fa.StateTable;
 
 public class DFAConverter {
     public static StateTable convertToDFA(StateTable table) {
-        StateTable DFATable = eliminateNonDeterminism(table);
+        StateTable DFATable;
+        DFATable = eliminateNonDeterminism(table);
         DFATable = removeDeadEnds(DFATable);
+        DFATable = removeUnobtainable(DFATable);
+        DFATable = mergeEquivalent(DFATable);
+        DFATable = completeTable(DFATable);
         return DFATable;
+    }
+
+    public static StateTable completeTable(StateTable table) {
+        StateTable DFATable = new StateTable(table);
+        DFATable = makeDeadState(DFATable);
+        DFATable.addTransitionLiteral(SpecialTransitions.otherTransition);
+        for (int state = 0; state < DFATable.stateTable.size(); state++) {
+            for (int transLit = 0; transLit < DFATable.stateTable.get(state).size(); transLit++) {
+                if (DFATable.stateTable.get(state).get(transLit).size() == 0) {
+                    DFATable.addTransition(DFATable.transitionLiterals.get(transLit), state, DFATable.getDeadState());
+                }
+            }
+        }
+
+        return DFATable;
+    }
+
+    public static StateTable makeDeadState(StateTable table) {
+        StateTable DFATable = new StateTable(table);
+        DFATable.addState();
+        DFATable.setDeadState(DFATable.stateTable.size() - 1);
+
+        return DFATable;
+
     }
 
     public static StateTable mergeEquivalent(StateTable table) {
