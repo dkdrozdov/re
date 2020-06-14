@@ -13,8 +13,8 @@ public class Parser {
                     nextToken = new Asterisk();
                     break;
                 }
-                case '^': {
-                    nextToken = new Concat();
+                case '|': {
+                    nextToken = new Alteration();
                     break;
                 }
                 default: {
