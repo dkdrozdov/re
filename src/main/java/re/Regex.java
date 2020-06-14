@@ -23,7 +23,7 @@ public class Regex {
 
     public static void main(String[] args) {
 
-        StateTable table = buildFA("a^b^c*^a*^c^b*");
-        AcceptorDecision decision = Acceptor.runStateTable(table, "");
+        StateTable table = buildFA("abc*a*cb*");
+        AcceptorDecision decision = Acceptor.runStateTable(table, "abc");
     }
 }
