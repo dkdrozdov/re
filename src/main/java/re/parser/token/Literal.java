@@ -5,8 +5,13 @@ import java.util.List;
 import re.fa.StateTable;
 
 public class Literal implements Token {
+
     String value = "";
 
+    @Override
+    public TokenType getType() {
+        return TokenType.LITERAL;
+    }
     @Override
     public int getPriority() {
 

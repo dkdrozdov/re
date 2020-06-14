@@ -6,6 +6,10 @@ import re.fa.StateTable;
 
 public class Concat implements Token {
     @Override
+    public TokenType getType() {
+        return TokenType.CONCAT;
+    }
+    @Override
     public int getPriority() {
 
         return TokenPriority.CONCAT.toInt();

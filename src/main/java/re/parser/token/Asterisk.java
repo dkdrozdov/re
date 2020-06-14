@@ -5,6 +5,10 @@ import java.util.List;
 import re.fa.StateTable;
 
 public class Asterisk implements Token {
+    @Override
+    public TokenType getType() {
+        return TokenType.ASTERISK;
+    }
     public StateTable apply(List<StateTable> operands) {
         StateTable table = new StateTable(operands.get(0));
         // int oldFinalState = table.getFinalState();
