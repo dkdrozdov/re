@@ -1,6 +1,7 @@
 package re;
 
 import java.util.List;
+import java.util.Scanner;
 
 import re.acceptor.Acceptor;
 import re.acceptor.Acceptor.AcceptorDecision;
@@ -22,8 +23,32 @@ public class Regex {
     }
 
     public static void main(String[] args) {
+        Scanner in = new Scanner(System.in);
+        // set up regex table
+        System.out.print("Enter a regular expression: ");
+        String regex = in.nextLine();
+        StateTable table = buildFA(regex);
+        // input string and get decision
+        String string = "";
+        System.out.print("Enter string: ");
+        string = in.nextLine();
+        while (!string.equals("exit")) {
+            AcceptorDecision decision = Acceptor.runStateTable(table, string);
+            switch (decision) {
+                case ACCEPT: {
+                    System.out.print("ACCEPT\n");
 
-        StateTable table = buildFA("abc*a*cb*");
-        AcceptorDecision decision = Acceptor.runStateTable(table, "abc");
+                    break;
+                }
+                case DENY: {
+                    System.out.print("DENY\n");
+
+                    break;
+                }
+            }
+            System.out.print("Enter string: ");
+            string = in.nextLine();
+        }
+        in.close();
     }
 }
