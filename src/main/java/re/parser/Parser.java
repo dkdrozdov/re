@@ -9,6 +9,17 @@ public class Parser {
         Token nextToken;
         for (int i = 0; i < s.length(); i++) {
             switch (s.charAt(i)) {
+                case '-': {
+                    Range range = new Range(s.charAt(i - 1), s.charAt(i + 1));
+                    i += 2;
+                    tokens.remove(tokens.size() - 1);
+                    List<Token> unfolded = parseNoConcat(range.unfold());
+                    for (int j = 0; j < unfolded.size() - 1; j++) {
+                        tokens.add(unfolded.get(j));
+                    }
+                    nextToken = unfolded.get(unfolded.size() - 1);
+                    break;
+                }
                 case '[': {
                     String passed = "";
                     i++;
