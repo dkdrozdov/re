@@ -2,8 +2,6 @@ package re.parser.token;
 
 import java.util.List;
 
-import javax.management.openmbean.OpenType;
-
 import re.fa.StateTable;
 
 public class Alteration implements Token {
