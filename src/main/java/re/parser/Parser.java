@@ -4,11 +4,21 @@ import java.util.*;
 import re.parser.token.*;
 
 public class Parser {
-    public static List<Token> parse(String s) {
+    public static List<Token> parseNoConcat(String s) {
         List<Token> tokens = new ArrayList<Token>();
         Token nextToken;
         for (int i = 0; i < s.length(); i++) {
             switch (s.charAt(i)) {
+                case '[': {
+                    String passed = "";
+                    i++;
+                    while (s.charAt(i) != ']') {
+                        passed = passed.concat(String.valueOf(s.charAt(i)));
+                        i++;
+                    }
+                    nextToken = new CapturingGroup(insert(parseNoConcat(passed), new Alteration()));
+                    break;
+                }
                 case '+': {
                     // repeat last added token
                     tokens.add(tokens.get(tokens.size() - 1));
@@ -39,8 +49,29 @@ public class Parser {
             }
             tokens.add(nextToken);
         }
-        tokens = insertConcatenations(tokens);
         return tokens;
+    }
+
+    public static List<Token> parse(String s) {
+        return insert(parseNoConcat(s), new Concat());
+    }
+
+    public static Token createTokenOfTokenType(Token token) {
+        TokenType tokenType = token.getType();
+        Token newToken = null;
+        switch (tokenType) {
+            case ALTERATION: {
+                newToken = new Alteration();
+                break;
+            }
+            case CONCAT: {
+                newToken = new Concat();
+                break;
+            }
+            default: {
+            }
+        }
+        return newToken;
     }
 
     public static List<Token> insert(List<Token> initialTokens, Token toInsert) {
