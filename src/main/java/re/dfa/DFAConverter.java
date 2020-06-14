@@ -20,6 +20,7 @@ public class DFAConverter {
 
     public static StateTable completeTable(StateTable table) {
         StateTable DFATable = new StateTable(table);
+        DFATable.addFreeTransition(DFATable.getFinalState(), DFATable.getFinalState());
         DFATable = makeDeadState(DFATable);
         DFATable.addTransitionLiteral(SpecialTransitions.otherTransition);
         for (int state = 0; state < DFATable.stateTable.size(); state++) {
