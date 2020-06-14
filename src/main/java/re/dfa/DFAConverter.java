@@ -1,6 +1,7 @@
 package re.dfa;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import re.fa.SpecialTransitions;
@@ -11,6 +12,95 @@ public class DFAConverter {
         StateTable DFATable = eliminateNonDeterminism(table);
         DFATable = removeDeadEnds(DFATable);
         return DFATable;
+    }
+
+    public static StateTable mergeEquivalent(StateTable table) {
+        StateTable DFATable = new StateTable(table);
+        List<Integer> equivalentStates = findFirstEquivalent(DFATable);
+        while (equivalentStates.size() != 0) {
+            DFATable.mergeStates(equivalentStates.get(0), equivalentStates.get(1));
+            equivalentStates.clear();
+            equivalentStates = findFirstEquivalent(DFATable);
+        }
+
+        return DFATable;
+    }
+
+    public static List<Integer> findFirstEquivalent(StateTable table) {
+        List<Integer> newEquivalentStates = new ArrayList<Integer>();
+
+        for (int state1 = 0; state1 < table.stateTable.size(); state1++) {
+            for (int state2 = 0; state2 < table.stateTable.size(); state2++) {
+                if (state1 != state2) {
+                    List<Integer> differentTransitions = new ArrayList<Integer>();
+                    List<Integer> state1Destinations = table.StateDestinations(state1);
+                    List<Integer> state2Destinations = table.StateDestinations(state2);
+                    Collections.sort(state1Destinations);
+                    Collections.sort(state2Destinations);
+                    if (state1Destinations.equals(state2Destinations)) {
+                        newEquivalentStates.add(state1);
+                        newEquivalentStates.add(state2);
+                        return newEquivalentStates;
+                    }
+                    for (int transLit = 0; transLit < table.stateTable.get(state1).size(); transLit++) {
+                        Collections.sort(table.stateTable.get(state1).get(transLit));
+                        Collections.sort(table.stateTable.get(state2).get(transLit));
+                        List<Integer> state1Transitions = table.stateTable.get(state1).get(transLit);
+                        List<Integer> state2Transitions = table.stateTable.get(state2).get(transLit);
+                        if (!state1Transitions.equals(state2Transitions)) {
+                            differentTransitions.add(transLit);
+                        }
+                    }
+                    if (differentTransitions.size() == 1) {
+                        int transLit = differentTransitions.get(0);
+                        if (transitionsMutual(table, transLit, state1, state2)) {
+                            table.stateTable.get(state2).get(transLit).clear();
+                            table.stateTable.get(state1).get(transLit).clear();
+                            table.stateTable.get(state1).get(transLit).add(state1);
+                            newEquivalentStates.add(state1);
+                            newEquivalentStates.add(state2);
+                            return newEquivalentStates;
+                        }
+                    }
+                    // else if (differentTransitions.size() == 0) {
+                    // newEquivalentStates.add(state1);
+                    // newEquivalentStates.add(state2);
+                    // return newEquivalentStates;
+                    // }
+                }
+            }
+        }
+        return newEquivalentStates;
+    }
+
+    public static boolean transitionsMutual(StateTable table, int transLit, int state1, int state2) {
+        // check for exterior transitions
+        for (int transition = 0; transition < table.stateTable.get(state1).get(transLit).size(); transition++) {
+            if (table.stateTable.get(state1).get(transLit).get(transition) != state1
+                    && table.stateTable.get(state1).get(transLit).get(transition) != state2) {
+                return false;
+            }
+        }
+        for (int transition = 0; transition < table.stateTable.get(state2).get(transLit).size(); transition++) {
+            if (table.stateTable.get(state2).get(transLit).get(transition) != state1
+                    && table.stateTable.get(state2).get(transLit).get(transition) != state2) {
+                return false;
+            }
+        }
+        // check for mutualness
+        if ((table.stateTable.get(state1).get(transLit).contains(state1) /* both lead to themselves */
+                && table.stateTable.get(state2).get(transLit).contains(state2))
+                || (table.stateTable.get(state1).get(transLit).contains(state2) /* both lead to each other */
+                        && table.stateTable.get(state2).get(transLit).contains(state1))
+                || (table.stateTable.get(state1).get(transLit).contains(state1) /* first leads to itself */
+                        && table.stateTable.get(state2).get(transLit).contains(state1)) /* and second leads to first */
+                || (table.stateTable.get(state1).get(transLit).contains(state2) /* first leads to second */
+                        && table.stateTable.get(state2).get(transLit) /* and second leads to itself */
+                                .contains(state2))) {
+            return true;
+        }
+
+        return false;
     }
 
     public static StateTable removeUnobtainable(StateTable table) {
