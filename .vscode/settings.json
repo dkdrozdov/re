@@ -6,5 +6,6 @@
         "**/.settings": true,
         "**/.factorypath": true,
         "**/bin/": true,
-    }
+    },
+    "java.configuration.updateBuildConfiguration": "interactive"
 }
