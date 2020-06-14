@@ -9,6 +9,12 @@ public class Parser {
         Token nextToken;
         for (int i = 0; i < s.length(); i++) {
             switch (s.charAt(i)) {
+                case '+': {
+                    // repeat last added token
+                    tokens.add(tokens.get(tokens.size() - 1));
+                    nextToken = new Asterisk();
+                    break;
+                }
                 case '(': {
                     String passed = "";
                     i++;
