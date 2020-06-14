@@ -5,9 +5,100 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
+
+import re.fa.SpecialTransitions;
 import re.fa.StateTable;
 
 public class DFAConverterTests {
+
+    @Test
+    public void convertToDFATest() {
+        // set up test table
+        StateTable table = new StateTable();
+        table.addTransitionLiteral("a");
+        table.addTransitionLiteral("b");
+        table.addTransitionLiteral("c");
+        table.addTransitionLiteral("0");
+        table.addTransitionLiteral("1");
+        table.addTransitionLiteral("2");
+        table.addTransitionLiteral("3");
+        table.addTransitionLiteral(".");
+        for (int i = 0; i < 18; i++) {
+            table.addState();
+        }
+        table.addTransition("a", 0, 1);
+        table.addTransition("b", 1, 2);
+        table.addTransition("b", 2, 2);
+        table.addFreeTransition(1, 3);
+        table.addFreeTransition(2, 3);
+        table.addFreeTransition(3, 19);
+        table.addTransition("c", 0, 4);
+        table.addTransition("c", 0, 9);
+        table.addTransition("c", 4, 4);
+        table.addTransition("c", 9, 9);
+        table.addFreeTransition(0, 10);
+        table.addFreeTransition(9, 10);
+        table.addFreeTransition(4, 5);
+        table.addFreeTransition(5, 19);
+        table.addTransition(".", 5, 6);
+        table.addTransition(".", 10, 11);
+        table.addTransition("c", 11, 12);
+        table.addTransition("c", 12, 12);
+        table.addTransition("c", 6, 7);
+        table.addTransition("c", 7, 7);
+        table.addTransition("c", 11, 12);
+        table.addFreeTransition(6, 8);
+        table.addFreeTransition(12, 13);
+        table.addFreeTransition(7, 8);
+        table.addFreeTransition(8, 19);
+        table.addFreeTransition(13, 19);
+        table.addTransition("0", 0, 14);
+        table.addFreeTransition(14, 19);
+        table.addTransition("1", 0, 15);
+        table.addFreeTransition(15, 19);
+        table.addTransition("2", 0, 16);
+        table.addFreeTransition(16, 19);
+        table.addTransition("3", 0, 17);
+        table.addFreeTransition(17, 19);
+        table.setFinalState(19);
+        // set up expected table
+        StateTable expected = new StateTable();
+        expected.removeState(1);
+        expected.removeState(0);
+        expected.addTransitionLiteral("b");
+        expected.addTransitionLiteral(SpecialTransitions.freeTransition);
+        expected.addTransitionLiteral("a");
+        expected.addTransitionLiteral("c");
+        expected.addTransitionLiteral(".");
+        expected.addTransitionLiteral("0");
+        expected.addTransitionLiteral("1");
+        expected.addTransitionLiteral("2");
+        expected.addTransitionLiteral("3");
+        for (int i = 0; i < 7; i++) {
+            expected.addState();
+        }
+        expected.addTransition("a", 0, 1);
+        expected.addTransition("c", 0, 3);
+        expected.addTransition(".", 0, 6);
+        expected.addTransition("0", 0, 5);
+        expected.addTransition("1", 0, 5);
+        expected.addTransition("2", 0, 5);
+        expected.addTransition("3", 0, 5);
+        expected.addTransition("b", 1, 1);
+        expected.addTransition("c", 3, 3);
+        expected.addTransition(".", 3, 4);
+        expected.addTransition("c", 4, 4);
+        expected.addTransition("c", 6, 4);
+        expected.addFreeTransition(1, 2);
+        expected.addFreeTransition(3, 2);
+        expected.addFreeTransition(4, 2);
+        expected.addFreeTransition(5, 2);
+        expected.setFinalState(2);
+        expected = DFAConverter.completeTable(expected);
+        // set up actual table
+        StateTable actual = new StateTable(DFAConverter.convertToDFA(table));
+        assertEquals(expected, actual);
+    }
 
     @Test
     public void mergeEquivalentTest() {
