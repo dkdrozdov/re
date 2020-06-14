@@ -43,7 +43,7 @@ public class Parser {
         return tokens;
     }
 
-    public static List<Token> insertConcatenations(List<Token> initialTokens) {
+    public static List<Token> insert(List<Token> initialTokens, Token toInsert) {
         List<Token> tokens = new ArrayList<Token>();
 
         for (int i = 0; i < initialTokens.size(); i++) {
@@ -52,32 +52,22 @@ public class Parser {
                 TokenType tokenType = initialTokens.get(i).getType();
                 switch (tokenType) {
                     case LITERAL: {
-                        if (initialTokens.get(i + 1).getType() == TokenType.LITERAL) {
-                            tokens.add(new Concat());
-                        }
-                        if (initialTokens.get(i + 1).getType() == TokenType.CAPTURING_GROUP) {
-                            tokens.add(new Concat());
+                        if (tokenAllowsInserting(initialTokens.get(i + 1))) {
+                            tokens.add(createTokenOfTokenType(toInsert));
                         }
                         break;
                     }
                     case ASTERISK: {
-                        if (initialTokens.get(i + 1).getType() == TokenType.LITERAL) {
-                            tokens.add(new Concat());
-                        }
-                        if (initialTokens.get(i + 1).getType() == TokenType.CAPTURING_GROUP) {
-                            tokens.add(new Concat());
+                        if (tokenAllowsInserting(initialTokens.get(i + 1))) {
+                            tokens.add(createTokenOfTokenType(toInsert));
                         }
                         break;
                     }
                     case CAPTURING_GROUP: {
-                        if (initialTokens.get(i + 1).getType() == TokenType.LITERAL) {
-                            tokens.add(new Concat());
-                        }
-                        if (initialTokens.get(i + 1).getType() == TokenType.CAPTURING_GROUP) {
-                            tokens.add(new Concat());
+                        if (tokenAllowsInserting(initialTokens.get(i + 1))) {
+                            tokens.add(createTokenOfTokenType(toInsert));
                         }
                         break;
-
                     }
                     default: {
 
@@ -85,7 +75,16 @@ public class Parser {
                 }
             }
         }
-
         return tokens;
+    }
+
+    public static boolean tokenAllowsInserting(Token token) {
+        if (token.getType() == TokenType.LITERAL) {
+            return true;
+        }
+        if (token.getType() == TokenType.CAPTURING_GROUP) {
+            return true;
+        }
+        return false;
     }
 }

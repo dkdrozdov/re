@@ -20,7 +20,7 @@ public class ParserTests {
         actual.add(new Literal("c"));
         actual.add(new Literal("d"));
         actual.add(new Asterisk());
-        actual = Parser.insertConcatenations(actual);
+        actual = Parser.insert(actual, new Concat());
         // set up expected tokens
         List<Token> expected = new ArrayList<Token>();
         expected.add(new Literal("a"));
