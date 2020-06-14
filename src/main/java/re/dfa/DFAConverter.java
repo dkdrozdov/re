@@ -33,8 +33,8 @@ public class DFAConverter {
             for (int state2 = 0; state2 < table.stateTable.size(); state2++) {
                 if (state1 != state2) {
                     List<Integer> differentTransitions = new ArrayList<Integer>();
-                    List<Integer> state1Destinations = table.StateDestinations(state1);
-                    List<Integer> state2Destinations = table.StateDestinations(state2);
+                    List<Integer> state1Destinations = table.stateDestinations(state1);
+                    List<Integer> state2Destinations = table.stateDestinations(state2);
                     Collections.sort(state1Destinations);
                     Collections.sort(state2Destinations);
                     if (state1Destinations.equals(state2Destinations)) {
@@ -62,11 +62,6 @@ public class DFAConverter {
                             return newEquivalentStates;
                         }
                     }
-                    // else if (differentTransitions.size() == 0) {
-                    // newEquivalentStates.add(state1);
-                    // newEquivalentStates.add(state2);
-                    // return newEquivalentStates;
-                    // }
                 }
             }
         }

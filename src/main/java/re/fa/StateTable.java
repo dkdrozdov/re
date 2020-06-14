@@ -294,4 +294,18 @@ public class StateTable {
             }
         }
     }
+
+    public List<Integer> stateDestinations(int state) {
+        List<Integer> destinations = new ArrayList<Integer>();
+        for (int transLit = 0; transLit < stateTable.get(state).size(); transLit++) {
+            for (int transition = 0; transition < stateTable.get(state).get(transLit).size(); transition++) {
+                int currentTransition = stateTable.get(state).get(transLit).get(transition);
+                if (!destinations.contains(currentTransition)) {
+                    destinations.add(currentTransition);
+                }
+            }
+        }
+
+        return destinations;
+    }
 }
