@@ -5,15 +5,29 @@ import java.util.*;
 public class StateTable {
     public List<List<List<Integer>>> stateTable = null;
     public List<String> transitionLiterals = null;
+    public List<Integer> metaFinalStates = null;
+    public List<String> metaFinalStatesNames = null;
     int startState;
     int finalState;
     int deadState;
 
     public StateTable() {
+        metaFinalStatesNames = new ArrayList<String>();
+        metaFinalStates = new ArrayList<Integer>();
         stateTable = new ArrayList<List<List<Integer>>>();
         transitionLiterals = new ArrayList<String>();
         startState = addState();
         finalState = addState();
+    }
+
+    public void addMetaFinalState(int state, String name) {
+        if (!metaFinalStatesNames.contains(name)) {
+            metaFinalStatesNames.add(name);
+            metaFinalStates.add(state);
+        } else {
+            int duplicateIndex = metaFinalStatesNames.indexOf(name);
+            mergeStates(duplicateIndex, state);
+        }
     }
 
     public int getFinalState() {
@@ -30,6 +44,8 @@ public class StateTable {
     }
 
     public StateTable(StateTable table) {
+        metaFinalStatesNames = new ArrayList<String>();
+        metaFinalStates = new ArrayList<Integer>();
         stateTable = new ArrayList<List<List<Integer>>>();
         transitionLiterals = new ArrayList<String>();
 
@@ -41,6 +57,10 @@ public class StateTable {
                     this.stateTable.get(row).get(transLit).add(table.stateTable.get(row).get(transLit).get(transition));
                 }
             }
+        }
+        for (int i = 0; i < table.metaFinalStates.size(); i++) {
+            this.metaFinalStates.add(table.metaFinalStates.get(i));
+            this.metaFinalStatesNames.add(table.metaFinalStatesNames.get(i));
         }
         table.transitionLiterals.forEach(lit -> {
             this.transitionLiterals.add(lit);
@@ -109,6 +129,9 @@ public class StateTable {
         if (getFinalState() == oldIndex) {
             finalState = newIndex;
         }
+        if (metaFinalStates.contains(oldIndex)) {
+            metaFinalStates.set(metaFinalStates.indexOf(oldIndex), newIndex);
+        }
     }
 
     void increaseStateIndexes(int n) {
@@ -124,6 +147,10 @@ public class StateTable {
         startState += n;
         // increase finalState
         finalState += n;
+        // increase metaFinals
+        for (int i = 0; i < metaFinalStates.size(); i++) {
+            metaFinalStates.set(i, metaFinalStates.get(i) + n);
+        }
     }
 
     private void swapColumns(int index1, int index2) {
@@ -242,6 +269,16 @@ public class StateTable {
         }
     }
 
+    public boolean isFinal(int state) {
+        if (state == finalState) {
+            return true;
+        }
+        if (metaFinalStates.contains(state)) {
+            return true;
+        }
+        return false;
+    }
+
     public void mergeStates(int state1, int state2) {
         copyTransitions(state1, state2);
         replaceStateIndex(state2, state1);
@@ -257,6 +294,9 @@ public class StateTable {
             replaceStateIndex(s, s - 1);
         }
         stateTable.remove(state);
+        if (metaFinalStates.indexOf(state) != -1) {
+            metaFinalStates.remove(metaFinalStates.indexOf(state));
+        }
     }
 
     public void addFreeTransition(int fromState, int toState) {
@@ -317,5 +357,9 @@ public class StateTable {
 
     public int getDeadState() {
         return deadState;
+    }
+
+    public String getMetaFinalName(int state) {
+        return metaFinalStatesNames.get(metaFinalStates.indexOf(state));
     }
 }
