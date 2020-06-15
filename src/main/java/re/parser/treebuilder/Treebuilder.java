@@ -32,8 +32,10 @@ public class Treebuilder {
         }
         // Launch this function recursive for part by left and right of first
         // highest-priority token of tokens list.
-        n.addChild(buildTree(tokens.subList(0, highestPriorityTokenIndex)));
-        n.addChild(buildTree(tokens.subList(highestPriorityTokenIndex + 1, tokens.size())));
+        if (n != null) {
+            n.addChild(buildTree(tokens.subList(0, highestPriorityTokenIndex)));
+            n.addChild(buildTree(tokens.subList(highestPriorityTokenIndex + 1, tokens.size())));
+        }
 
         return n;
     }
