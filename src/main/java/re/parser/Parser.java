@@ -1,6 +1,8 @@
 package re.parser;
 
 import java.util.*;
+
+import re.fa.SpecialTransitions;
 import re.parser.token.*;
 
 public class Parser {
@@ -9,6 +11,17 @@ public class Parser {
         Token nextToken;
         for (int i = 0; i < s.length(); i++) {
             switch (s.charAt(i)) {
+                case '{': {
+                    String passed = "";
+                    i++;
+                    while (s.charAt(i) != '}') {
+                        passed = passed.concat(String.valueOf(s.charAt(i)));
+                        i++;
+                    }
+                    nextToken = null;
+                    parseQuantifier(passed, tokens);
+                    break;
+                }
                 case '-': {
                     Range range = new Range(s.charAt(i - 1), s.charAt(i + 1));
                     i += 2;
@@ -58,9 +71,73 @@ public class Parser {
                     nextToken = new Literal(String.valueOf(s.charAt(i)));
                 }
             }
-            tokens.add(nextToken);
+            if (nextToken != null) {
+                tokens.add(nextToken);
+            }
         }
         return tokens;
+    }
+
+    private static void parseQuantifier(String insides, List<Token> relatedTokens) {
+        Token relatedToken = relatedTokens.get(relatedTokens.size() - 1);
+        relatedTokens.remove(relatedTokens.size() - 1);
+        CapturingGroup parsedGroup;
+        List<Token> parsed = new ArrayList<Token>();
+        // set up insidesList
+        List<String> insidesList = new ArrayList<String>();
+        char[] insidesArray = insides.toCharArray();
+        for (char character : insidesArray) {
+            insidesList.add(String.valueOf(character));
+        }
+
+        if (insidesList.contains(",")) {
+            int commaIndex = insidesList.indexOf(",");
+            // up-unlimited range
+            if (commaIndex == insidesList.size() - 1) {
+                int from = Integer.parseInt(insides.substring(0, commaIndex));
+                for (int i = 0; i <= from; i++) {
+                    parsed.add(relatedToken);
+                }
+                parsed.add(new Asterisk());
+                parsedGroup = new CapturingGroup(insert(parsed, new Concat()));
+                relatedTokens.add(parsedGroup);
+                return;
+            }
+            // down-unlimited range
+            if (commaIndex == 0) {
+                // reduce the problem to limited range
+                relatedTokens.add(relatedToken);
+                parseQuantifier("0".concat(",").concat(insides.substring(commaIndex + 1, insidesList.size())),
+                        relatedTokens);
+                return;
+            }
+            // case limited range
+            int from = Integer.parseInt(insides.substring(0, commaIndex));
+            int to = Integer.parseInt(insides.substring(commaIndex + 1, insidesList.size()));
+            for (int i = from; i <= to; i++) {
+                parsed.add(new CapturingGroup((parseFixedQuantifier(String.valueOf(i), relatedToken))));
+            }
+            relatedTokens.add(new CapturingGroup(insert(parsed, new Alteration())));
+            return;
+
+        } else { // 3. case fixed number
+            parsedGroup = parseFixedQuantifier(insides, relatedToken);
+            relatedTokens.add(parsedGroup);
+            return;
+        }
+    }
+
+    private static CapturingGroup parseFixedQuantifier(String insides, Token relatedToken) {
+        List<Token> parsed = new ArrayList<Token>();
+        int to = Integer.parseInt(insides);
+        if (to == 0) {
+            parsed.add(new Literal(SpecialTransitions.freeTransition));
+        }
+        for (int i = 0; i < to; i++) {
+            parsed.add(relatedToken);
+        }
+        parsed = insert(parsed, new Concat());
+        return new CapturingGroup(parsed);
     }
 
     public static List<Token> parse(String s) {
