@@ -11,6 +11,10 @@ public class CapturingGroup implements Token {
         tokensGroup = tokens;
     }
 
+    public CapturingGroup(CapturingGroup group) {
+        tokensGroup = group.getTokens();
+    }
+
     @Override
     public TokenType getType() {
         return TokenType.CAPTURING_GROUP;
