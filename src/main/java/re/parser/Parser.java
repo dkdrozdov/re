@@ -27,6 +27,13 @@ public class Parser {
                     String passed = "";
                     i++;
                     while (s.charAt(i) != '}') {
+                        if (s.charAt(i) == backSlash) {
+                            passed = passed.concat(String.valueOf(s.charAt(i)));
+                            i++;
+                            passed = passed.concat(String.valueOf(s.charAt(i)));
+                            i++;
+                            continue;
+                        }
                         passed = passed.concat(String.valueOf(s.charAt(i)));
                         i++;
                     }
@@ -49,6 +56,13 @@ public class Parser {
                     String passed = "";
                     i++;
                     while (s.charAt(i) != ']') {
+                        if (s.charAt(i) == backSlash) {
+                            passed = passed.concat(String.valueOf(s.charAt(i)));
+                            i++;
+                            passed = passed.concat(String.valueOf(s.charAt(i)));
+                            i++;
+                            continue;
+                        }
                         passed = passed.concat(String.valueOf(s.charAt(i)));
                         i++;
                     }
@@ -65,6 +79,13 @@ public class Parser {
                     String passed = "";
                     i++;
                     while (s.charAt(i) != ')') {
+                        if (s.charAt(i) == backSlash) {
+                            passed = passed.concat(String.valueOf(s.charAt(i)));
+                            i++;
+                            passed = passed.concat(String.valueOf(s.charAt(i)));
+                            i++;
+                            continue;
+                        }
                         passed = passed.concat(String.valueOf(s.charAt(i)));
                         i++;
                     }

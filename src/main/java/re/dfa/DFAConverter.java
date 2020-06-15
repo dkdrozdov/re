@@ -60,7 +60,7 @@ public class DFAConverter {
 
         for (int state1 = 0; state1 < table.stateTable.size(); state1++) {
             for (int state2 = 0; state2 < table.stateTable.size(); state2++) {
-                if (state1 != state2) {
+                if ((state1 != state2) && (!table.isFinal(state1) || !table.isFinal(state2))) {
                     List<Integer> differentTransitions = new ArrayList<Integer>();
                     List<Integer> state1Destinations = table.stateDestinations(state1);
                     List<Integer> state2Destinations = table.stateDestinations(state2);
@@ -146,7 +146,7 @@ public class DFAConverter {
         List<Integer> deadEnds = new ArrayList<Integer>();
         StateTable DFATable = new StateTable(table);
         for (int state = 0; state < table.stateTable.size(); state++) {
-            if (!stateLeadsToState(table, state, new ArrayList<Integer>(), table.getFinalState())) {
+            if (!stateLeadsToFinal(table, state, new ArrayList<Integer>())) {
                 deadEnds.add(state);
             }
         }
@@ -155,6 +155,23 @@ public class DFAConverter {
             DFATable.removeState(deadEnds.get(deadEnd));
         }
         return DFATable;
+    }
+
+    private static boolean stateLeadsToFinal(StateTable table, int state, List<Integer> marked) {
+        if (table.isFinal(state)) {
+            return true;
+        }
+        for (int transLit = 0; transLit < table.stateTable.get(state).size(); transLit++) {
+            for (int transition : table.stateTable.get(state).get(transLit)) {
+                if (!marked.contains(transition)) {
+                    marked.add(transition);
+                    if (stateLeadsToFinal(table, transition, marked)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     public static boolean stateLeadsToState(StateTable table, int state, List<Integer> marked, int destinationState) {
@@ -196,6 +213,9 @@ public class DFAConverter {
                 if (state == finalState) {
                     DFATable.setFinalState(handledStateLists.indexOf(states));
                 }
+                if (table.metaFinalStates.contains(state) && !(DFATable.metaFinalStates.contains(state))) {
+                    DFATable.addMetaFinalState(handledStateLists.indexOf(states), table.getMetaFinalName(state));
+                }
             }
         }
     }
@@ -228,7 +248,7 @@ public class DFAConverter {
         for (int state : currentStates) {
             for (int transition : table.stateTable.get(state).get(transLit)) {
                 // exclude free non-final transitions
-                if (!(lit == SpecialTransitions.freeTransition && transition != table.getFinalState())) {
+                if (!(lit == SpecialTransitions.freeTransition && !table.isFinal(transition))) {
                     newStates.add(transition);
                 }
             }
@@ -252,7 +272,7 @@ public class DFAConverter {
                         .size(); transition++) {
                     int currentTransition = table.stateTable.get(currentState).get(transLit).get(transition);
                     // if transition isn't free to non-final state
-                    if (!(currentTransition != table.getFinalState()
+                    if (!(!table.isFinal(currentTransition)
                             && table.transitionLiterals.get(transLit) == SpecialTransitions.freeTransition)) {
                         // exclude duplicates
                         if (!currentStateLits.contains(table.transitionLiterals.get(transLit))) {
@@ -289,7 +309,7 @@ public class DFAConverter {
                 List<Integer> childStates = buildEpsilonClosure(table,
                         table.stateTable.get(startState).get(freeTransLitIndex).get(freeTransition));
                 for (Integer state : childStates) {
-                    if (!closureStates.contains(state) && (state != table.getFinalState())) {
+                    if (!closureStates.contains(state) && (!table.isFinal(state))) {
                         closureStates.add(state);
                     }
                 }
