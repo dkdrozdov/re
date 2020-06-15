@@ -11,6 +11,11 @@ public class Parser {
         Token nextToken;
         for (int i = 0; i < s.length(); i++) {
             switch (s.charAt(i)) {
+                case '?': {
+                    nextToken = null;
+                    parseQuantifier("0,1", tokens);
+                    break;
+                }
                 case '{': {
                     String passed = "";
                     i++;
