@@ -9,7 +9,14 @@ public class Parser {
     public static List<Token> parseNoConcat(String s) {
         List<Token> tokens = new ArrayList<Token>();
         Token nextToken;
+        String backSlashS = "\\";
+        char backSlash = backSlashS.toCharArray()[0];
         for (int i = 0; i < s.length(); i++) {
+            if (s.charAt(i) == backSlash) {
+                i++;
+                tokens.add(new Literal(String.valueOf(s.charAt(i))));
+                continue;
+            }
             switch (s.charAt(i)) {
                 case '?': {
                     nextToken = null;
