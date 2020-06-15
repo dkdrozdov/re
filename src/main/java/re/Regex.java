@@ -120,7 +120,6 @@ public class Regex {
             regex = in.nextLine();
         }
         StateTable table = buildDFASystem(regexes, names);
-
         // input string and get decision
         String string = "";
         List<List<String>> matched = new ArrayList<List<String>>();
