@@ -13,10 +13,11 @@ public class Literal implements Token {
         return TokenType.LITERAL;
     }
 
+    @Override
     public boolean equals(Object obj) {
         if (obj != null && getClass() == obj.getClass()) {
             Literal q = (Literal) obj;
-            return this.value == q.value;
+            return this.value.equals(q.value);
         }
         return false;
     }
