@@ -34,10 +34,11 @@ public class Acceptor {
     public static int feedTable(StateTable table, String inputLiteral, int currentState) {
         if (table.transitionLiterals.contains(inputLiteral)) {
             int literalIndex = table.transitionLiterals.indexOf(inputLiteral);
-            return table.stateTable.get(currentState).get(literalIndex).get(0);
+            return table.getTransition(currentState, literalIndex, 0);
+            // return table.stateTable.get(currentState).get(literalIndex).get(0);
         } else {
             int indexOfOtherTransition = table.transitionLiterals.indexOf(SpecialTransitions.otherTransition);
-            return table.stateTable.get(currentState).get(indexOfOtherTransition).get(0);
+            return table.getTransition(currentState, indexOfOtherTransition, 0);
         }
     }
 
