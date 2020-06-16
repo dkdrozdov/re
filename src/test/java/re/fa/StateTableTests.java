@@ -9,8 +9,7 @@ public class StateTableTests {
     public void concatenateStateTableTest() {
         // set up table1
         StateTable table1 = new StateTable();
-        table1.addState();
-        table1.finalState = table1.stateTable.size() - 1;
+        table1.finalState = table1.addState();
         table1.addTransitionLiteral("a");
         table1.addTransitionLiteral("b");
         table1.addTransitionLiteral("c");
@@ -22,8 +21,7 @@ public class StateTableTests {
         table1.addTransition("c", 1, 2);
         // set up table2
         StateTable table2 = new StateTable();
-        table2.addState();
-        table2.finalState = table2.stateTable.size() - 1;
+        table2.finalState = table2.addState();
         table2.addTransitionLiteral("d");
         table2.addTransitionLiteral("a");
         table2.addTransition("d", 0, 1);
@@ -32,8 +30,7 @@ public class StateTableTests {
         StateTable expectedTable = new StateTable();
         expectedTable.addState();
         expectedTable.addState();
-        expectedTable.addState();
-        expectedTable.finalState = expectedTable.stateTable.size() - 1;
+        expectedTable.finalState = expectedTable.addState();
         expectedTable.addTransitionLiteral("a");
         expectedTable.addTransitionLiteral("b");
         expectedTable.addTransitionLiteral("c");

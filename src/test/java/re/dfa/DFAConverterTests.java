@@ -334,8 +334,7 @@ public class DFAConverterTests {
         testTable.addState();
         testTable.addState();
         testTable.addState();
-        testTable.addState();
-        testTable.setFinalState(testTable.stateTable.size() - 1);
+        testTable.setFinalState(testTable.addState());
         testTable.addTransitionLiteral("a");
         testTable.addTransitionLiteral("b");
         testTable.addTransition("a", 0, 4);

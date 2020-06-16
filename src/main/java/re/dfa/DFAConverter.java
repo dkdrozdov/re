@@ -10,6 +10,8 @@ import re.fa.StateTable;
 public class DFAConverter {
     public static StateTable convertToDFA(StateTable table) {
         StateTable DFATable;
+        table = removeDeadEnds(table);
+        table = removeUnobtainable(table);
         DFATable = eliminateNonDeterminism(table);
         DFATable = removeDeadEnds(DFATable);
         DFATable = removeUnobtainable(DFATable);
@@ -23,7 +25,7 @@ public class DFAConverter {
         DFATable.addFreeTransition(DFATable.getFinalState(), DFATable.getFinalState());
         DFATable = makeDeadState(DFATable);
         DFATable.addTransitionLiteral(SpecialTransitions.otherTransition);
-        for (int state = 0; state < DFATable.stateTable.size(); state++) {
+        for (int state : DFATable.getRelevantStates()) {
             for (int transLit = 0; transLit < DFATable.stateTable.get(state).size(); transLit++) {
                 if (DFATable.stateTable.get(state).get(transLit).size() == 0) {
                     DFATable.addTransition(DFATable.transitionLiterals.get(transLit), state, DFATable.getDeadState());
@@ -36,8 +38,7 @@ public class DFAConverter {
 
     public static StateTable makeDeadState(StateTable table) {
         StateTable DFATable = new StateTable(table);
-        DFATable.addState();
-        DFATable.setDeadState(DFATable.stateTable.size() - 1);
+        DFATable.setDeadState(DFATable.addState());
 
         return DFATable;
 
@@ -48,6 +49,8 @@ public class DFAConverter {
         List<Integer> equivalentStates = findFirstEquivalent(DFATable);
         while (equivalentStates.size() != 0) {
             DFATable.mergeStates(equivalentStates.get(0), equivalentStates.get(1));
+            DFATable = removeDeadEnds(DFATable);
+            DFATable = removeUnobtainable(DFATable);
             equivalentStates.clear();
             equivalentStates = findFirstEquivalent(DFATable);
         }
@@ -57,9 +60,8 @@ public class DFAConverter {
 
     public static List<Integer> findFirstEquivalent(StateTable table) {
         List<Integer> newEquivalentStates = new ArrayList<Integer>();
-
-        for (int state1 = 0; state1 < table.stateTable.size(); state1++) {
-            for (int state2 = 0; state2 < table.stateTable.size(); state2++) {
+        for (int state1 : table.getRelevantStates()) {
+            for (int state2 : table.getRelevantStates()) {
                 if ((state1 != state2) && (!table.isFinal(state1) || !table.isFinal(state2))) {
                     List<Integer> differentTransitions = new ArrayList<Integer>();
                     List<Integer> state1Destinations = table.stateDestinations(state1);
@@ -100,14 +102,14 @@ public class DFAConverter {
     public static boolean transitionsMutual(StateTable table, int transLit, int state1, int state2) {
         // check for exterior transitions
         for (int transition = 0; transition < table.stateTable.get(state1).get(transLit).size(); transition++) {
-            if (table.stateTable.get(state1).get(transLit).get(transition) != state1
-                    && table.stateTable.get(state1).get(transLit).get(transition) != state2) {
+            if (table.getTransition(state1, transLit, transition) != state1
+                    && table.getTransition(state1, transLit, transition) != state2) {
                 return false;
             }
         }
         for (int transition = 0; transition < table.stateTable.get(state2).get(transLit).size(); transition++) {
-            if (table.stateTable.get(state2).get(transLit).get(transition) != state1
-                    && table.stateTable.get(state2).get(transLit).get(transition) != state2) {
+            if (table.getTransition(state2, transLit, transition) != state1
+                    && table.getTransition(state2, transLit, transition) != state2) {
                 return false;
             }
         }
@@ -130,7 +132,7 @@ public class DFAConverter {
     public static StateTable removeUnobtainable(StateTable table) {
         List<Integer> unobtainable = new ArrayList<Integer>();
         StateTable DFATable = new StateTable(table);
-        for (int state = 0; state < table.stateTable.size(); state++) {
+        for (int state : table.getRelevantStates()) {
             if (!stateLeadsToState(table, table.getStartState(), new ArrayList<Integer>(), state)) {
                 unobtainable.add(state);
             }
@@ -145,7 +147,10 @@ public class DFAConverter {
     public static StateTable removeDeadEnds(StateTable table) {
         List<Integer> deadEnds = new ArrayList<Integer>();
         StateTable DFATable = new StateTable(table);
-        for (int state = 0; state < table.stateTable.size(); state++) {
+        for (int state : table.getRelevantStates()) {
+            if (table.isDeleted(state)) {
+                continue;
+            }
             if (!stateLeadsToFinal(table, state, new ArrayList<Integer>())) {
                 deadEnds.add(state);
             }
@@ -267,6 +272,9 @@ public class DFAConverter {
         List<String> currentStateLits = new ArrayList<String>();
         for (int state = 0; state < currentStates.size(); state++) {
             int currentState = currentStates.get(state);
+            if (table.isDeleted(currentState)) {
+                continue;
+            }
             for (int transLit = 0; transLit < table.stateTable.get(currentState).size(); transLit++) {
                 for (int transition = 0; transition < table.stateTable.get(currentState).get(transLit)
                         .size(); transition++) {
@@ -307,9 +315,9 @@ public class DFAConverter {
             for (int freeTransition = 0; freeTransition < table.stateTable.get(startState).get(freeTransLitIndex)
                     .size(); freeTransition++) {
                 List<Integer> childStates = buildEpsilonClosure(table,
-                        table.stateTable.get(startState).get(freeTransLitIndex).get(freeTransition));
+                        table.getTransition(startState, freeTransLitIndex, freeTransition));
                 for (Integer state : childStates) {
-                    if (!closureStates.contains(state) && (!table.isFinal(state))) {
+                    if (!closureStates.contains(state) && (!table.isFinal(state) && (!table.isDeleted(state)))) {
                         closureStates.add(state);
                     }
                 }

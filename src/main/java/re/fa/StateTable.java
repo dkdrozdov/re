@@ -7,15 +7,27 @@ public class StateTable {
     public List<String> transitionLiterals = null;
     public List<Integer> metaFinalStates = null;
     public List<String> metaFinalStatesNames = null;
+    public List<Integer> deleted = null;
     int startState;
     int finalState;
     int deadState;
+
+    public List<Integer> getRelevantStates() {
+        List<Integer> relevant = new ArrayList<Integer>();
+        for (int i = 0; i < stateTable.size(); i++) {
+            relevant.add(i);
+        }
+        relevant.removeAll(deleted);
+
+        return relevant;
+    }
 
     public StateTable() {
         metaFinalStatesNames = new ArrayList<String>();
         metaFinalStates = new ArrayList<Integer>();
         stateTable = new ArrayList<List<List<Integer>>>();
         transitionLiterals = new ArrayList<String>();
+        deleted = new ArrayList<Integer>();
         startState = addState();
         finalState = addState();
     }
@@ -44,6 +56,7 @@ public class StateTable {
     }
 
     public StateTable(StateTable table) {
+        deleted = new ArrayList<Integer>();
         metaFinalStatesNames = new ArrayList<String>();
         metaFinalStates = new ArrayList<Integer>();
         stateTable = new ArrayList<List<List<Integer>>>();
@@ -57,6 +70,9 @@ public class StateTable {
                     this.stateTable.get(row).get(transLit).add(table.stateTable.get(row).get(transLit).get(transition));
                 }
             }
+        }
+        for (int i = 0; i < table.deleted.size(); i++) {
+            this.deleted.add(table.deleted.get(i));
         }
         for (int i = 0; i < table.metaFinalStates.size(); i++) {
             this.metaFinalStates.add(table.metaFinalStates.get(i));
@@ -90,6 +106,14 @@ public class StateTable {
 
     public int addState() {
         // Add new row of ints in the bottom of the table
+        if (deleted.size() != 0) {
+            int state = deleted.get(0);
+            deleted.remove(0);
+            for (int transLit = 0; transLit < stateTable.get(state).size(); transLit++) {
+                stateTable.get(state).get(transLit).clear();
+            }
+            return state;
+        }
         stateTable.add(new ArrayList<List<Integer>>());
         for (int i = 0; i < this.transitionLiterals.size(); i++) {
             stateTable.get(stateTable.size() - 1).add(new ArrayList<Integer>());
@@ -109,7 +133,6 @@ public class StateTable {
     }
 
     public void replaceStateOnlyTable(int oldIndex, int newIndex) {
-
         for (int row = 0; row < stateTable.size(); row++) {
             for (int transLit = 0; transLit < stateTable.get(row).size(); transLit++) {
                 for (int transition = 0; transition < stateTable.get(row).get(transLit).size(); transition++) {
@@ -290,11 +313,13 @@ public class StateTable {
     }
 
     public void removeState(int state) {
-        for (int s = state + 1; s < stateTable.size(); s++) {
-            replaceStateIndex(s, s - 1);
+        if (isDeleted(state)) {
+            throw new Error("State is already removed.");
         }
-        stateTable.remove(state);
+        removeTransitionsToState(state);
+        deleted.add(state);
         if (metaFinalStates.indexOf(state) != -1) {
+            metaFinalStatesNames.remove(metaFinalStates.indexOf(state));
             metaFinalStates.remove(metaFinalStates.indexOf(state));
         }
     }
@@ -361,5 +386,16 @@ public class StateTable {
 
     public String getMetaFinalName(int state) {
         return metaFinalStatesNames.get(metaFinalStates.indexOf(state));
+    }
+
+    public boolean isDeleted(Integer state) {
+        return deleted.contains(state);
+    }
+
+    public int getTransition(int state, int transLit, int transition) {
+        if (isDeleted(state) || isDeleted(stateTable.get(state).get(transLit).get(transition))) {
+            throw new Error("State is deleted.");
+        }
+        return stateTable.get(state).get(transLit).get(transition);
     }
 }
