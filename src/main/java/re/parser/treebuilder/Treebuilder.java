@@ -30,6 +30,9 @@ public class Treebuilder {
         if (highestPriorityToken.getType() == TokenType.CAPTURING_GROUP) {
             n = buildTree(((CapturingGroup) highestPriorityToken).getTokens());
         }
+        if (highestPriorityToken.getType() == TokenType.ALTERATION && ((Alteration) highestPriorityToken).isPlural()) {
+            n = buildTree((Alteration) highestPriorityToken);
+        }
         // Launch this function recursive for part by left and right of first
         // highest-priority token of tokens list.
         if (n != null) {
@@ -40,4 +43,19 @@ public class Treebuilder {
         return n;
     }
 
+    public static Node<Token> buildTree(Token t) {
+        List<Token> tList = new ArrayList<Token>();
+        tList.add(t);
+
+        return buildTree(tList);
+    }
+
+    public static Node<Token> buildTree(Alteration a) {
+        List<Token> operands = a.getOperands();
+        Node<Token> n = new Node<Token>(a);
+        for (Token operand : operands) {
+            n.addChild(buildTree(operand));
+        }
+        return n;
+    }
 }

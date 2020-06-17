@@ -49,6 +49,7 @@ public class Acceptor {
 
         int currentState = table.getStartState();
         String currentMatch = "";
+        String previousName = null;
         char[] inputArray = inputString.toCharArray();
         for (int i = 0; i < inputString.length(); i++) {
             String inputLiteral = String.valueOf(inputArray[i]);
@@ -64,7 +65,18 @@ public class Acceptor {
                     int metaFinalIndex = table.metaFinalStates.indexOf(currentState);
                     matchedNames.add(table.metaFinalStatesNames.get(metaFinalIndex));
                 }
-                matchedWords.add(new String(currentMatch));
+                if (previousName != null) {
+                    if (!matchedNames.get(matchedNames.size() - 1).equals(previousName)) {
+                        matchedWords.add(new String(currentMatch));
+                    } else {
+                        matchedNames.remove(matchedNames.size() - 1);
+                        matchedWords.set(matchedWords.size() - 1,
+                                matchedWords.get(matchedWords.size() - 1).concat(currentMatch));
+                    }
+                } else {
+                    matchedWords.add(new String(currentMatch));
+                }
+                previousName = matchedNames.get(matchedNames.size() - 1);
                 currentMatch = "";
                 currentState = table.getStartState();
             }
@@ -72,6 +84,7 @@ public class Acceptor {
                 if (currentMatch.length() != 1) {
                     i--;
                 }
+                previousName = null;
                 currentMatch = "";
                 currentState = table.getStartState();
             }

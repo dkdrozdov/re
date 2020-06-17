@@ -6,6 +6,7 @@ import re.fa.SpecialTransitions;
 import re.parser.token.*;
 
 public class Parser {
+
     public static List<Token> parseNoConcat(String s) {
         List<Token> tokens = new ArrayList<Token>();
         Token nextToken;
@@ -14,106 +15,7 @@ public class Parser {
         for (int i = 0; i < s.length(); i++) {
             if (s.charAt(i) == backSlash) {
                 i++;
-                switch (s.charAt(i)) {
-                    case 'n': {
-                        List<Token> newToken = new ArrayList<Token>();
-                        newToken.add(new Literal("\n"));
-                        tokens.add(new CapturingGroup(newToken));
-                        break;
-                    }
-                    case 't': {
-                        List<Token> newToken = new ArrayList<Token>();
-                        newToken.add(new Literal("\t"));
-                        tokens.add(new CapturingGroup(newToken));
-                        break;
-                    }
-                    case 'w': {
-                        Range range = new Range('A', 'Z');
-                        List<Token> unfolded = range.unfold();
-                        range = new Range('a', 'z');
-                        unfolded.addAll(range.unfold());
-                        range = new Range('0', '9');
-                        unfolded.addAll(range.unfold());
-                        unfolded.add(new Literal("_"));
-                        tokens.add(new CapturingGroup(insert(unfolded, new Alteration())));
-                        break;
-                    }
-                    case 'W': {
-                        Range range = new Range(0, 255);
-                        List<Token> unfolded = range.unfold();
-                        range = new Range('a', 'z');
-                        unfolded.removeAll(range.unfold());
-                        range = new Range('A', 'Z');
-                        unfolded.removeAll(range.unfold());
-                        range = new Range('0', '9');
-                        unfolded.removeAll(range.unfold());
-                        unfolded.remove(new Literal("_"));
-                        tokens.add(new CapturingGroup(insert(unfolded, new Alteration())));
-                        break;
-                    }
-                    case 'a': {
-                        Range range = new Range('a', 'z');
-                        List<Token> unfolded = range.unfold();
-                        range = new Range('A', 'Z');
-                        unfolded.addAll(range.unfold());
-                        tokens.add(new CapturingGroup(insert(unfolded, new Alteration())));
-                        break;
-                    }
-                    case 's': {
-                        List<Token> unfolded = new ArrayList<Token>();
-                        unfolded.add(new Literal(" "));
-                        unfolded.add(new Literal("\t"));
-                        tokens.add(new CapturingGroup(insert(unfolded, new Alteration())));
-                        break;
-                    }
-                    case 'd': {
-                        Range range = new Range('0', '9');
-                        List<Token> unfolded = range.unfold();
-                        tokens.add(new CapturingGroup(insert(unfolded, new Alteration())));
-                        break;
-                    }
-                    case 'D': {
-                        Range range = new Range(0, 255);
-                        List<Token> unfolded = range.unfold();
-                        range = new Range('0', '9');
-                        unfolded.removeAll(range.unfold());
-                        tokens.add(new CapturingGroup(insert(unfolded, new Alteration())));
-                        break;
-                    }
-                    case 'l': {
-                        Range range = new Range('a', 'z');
-                        List<Token> unfolded = range.unfold();
-                        tokens.add(new CapturingGroup(insert(unfolded, new Alteration())));
-                        break;
-                    }
-                    case 'S': {
-                        Range range = new Range(0, 255);
-                        List<Token> unfolded = range.unfold();
-                        unfolded.remove(new Literal(" "));
-                        unfolded.remove(new Literal("\t"));
-                        tokens.add(new CapturingGroup(insert(unfolded, new Alteration())));
-                        break;
-                    }
-                    case 'u': {
-                        Range range = new Range('A', 'Z');
-                        List<Token> unfolded = range.unfold();
-                        tokens.add(new CapturingGroup(insert(unfolded, new Alteration())));
-                        break;
-                    }
-                    case 'x': {
-                        Range range = new Range('A', 'F');
-                        List<Token> unfolded = range.unfold();
-                        range = new Range('a', 'f');
-                        unfolded.addAll(range.unfold());
-                        range = new Range('0', '9');
-                        unfolded.addAll(range.unfold());
-                        tokens.add(new CapturingGroup(insert(unfolded, new Alteration())));
-                        break;
-                    }
-                    default: {
-                        tokens.add(new Literal(String.valueOf(s.charAt(i))));
-                    }
-                }
+                tokens.addAll(handleBackslash(s, i));
                 continue;
             }
             switch (s.charAt(i)) {
@@ -122,7 +24,7 @@ public class Parser {
                     int rangeTo = 255;
                     Range range = new Range(rangeFrom, rangeTo);
                     List<Token> unfolded = range.unfold();
-                    nextToken = new CapturingGroup(insert(unfolded, new Alteration()));
+                    nextToken = new CapturingGroup(new Alteration(unfolded));
                     break;
                 }
                 case '?': {
@@ -134,13 +36,6 @@ public class Parser {
                     String passed = "";
                     i++;
                     while (s.charAt(i) != '}') {
-                        if (s.charAt(i) == backSlash) {
-                            passed = passed.concat(String.valueOf(s.charAt(i)));
-                            i++;
-                            passed = passed.concat(String.valueOf(s.charAt(i)));
-                            i++;
-                            continue;
-                        }
                         passed = passed.concat(String.valueOf(s.charAt(i)));
                         i++;
                     }
@@ -150,7 +45,7 @@ public class Parser {
                 }
                 case '-': {
                     Range range = new Range(s.charAt(i - 1), s.charAt(i + 1));
-                    i += 2;
+                    i += 1;
                     tokens.remove(tokens.size() - 1);
                     List<Token> unfolded = range.unfold();
                     for (int j = 0; j < unfolded.size() - 1; j++) {
@@ -162,18 +57,11 @@ public class Parser {
                 case '[': {
                     String passed = "";
                     i++;
-                    while (s.charAt(i) != ']') {
-                        if (s.charAt(i) == backSlash) {
-                            passed = passed.concat(String.valueOf(s.charAt(i)));
-                            i++;
-                            passed = passed.concat(String.valueOf(s.charAt(i)));
-                            i++;
-                            continue;
-                        }
+                    while (s.charAt(i) != ']' || s.substring(i - 1, i + 1).equals(backSlashS.concat("]"))) {
                         passed = passed.concat(String.valueOf(s.charAt(i)));
                         i++;
                     }
-                    nextToken = new CapturingGroup(insert(parseNoConcat(passed), new Alteration()));
+                    nextToken = new CapturingGroup((Token) new Alteration(parseNoConcat(passed)));
                     break;
                 }
                 case '+': {
@@ -186,13 +74,6 @@ public class Parser {
                     String passed = "";
                     i++;
                     while (s.charAt(i) != ')') {
-                        if (s.charAt(i) == backSlash) {
-                            passed = passed.concat(String.valueOf(s.charAt(i)));
-                            i++;
-                            passed = passed.concat(String.valueOf(s.charAt(i)));
-                            i++;
-                            continue;
-                        }
                         passed = passed.concat(String.valueOf(s.charAt(i)));
                         i++;
                     }
@@ -213,6 +94,111 @@ public class Parser {
             }
             if (nextToken != null) {
                 tokens.add(nextToken);
+            }
+        }
+        return tokens;
+    }
+
+    private static List<Token> handleBackslash(String s, int i) {
+        List<Token> tokens = new ArrayList<Token>();
+        switch (s.charAt(i)) {
+            case 'n': {
+                List<Token> newToken = new ArrayList<Token>();
+                newToken.add(new Literal("\n"));
+                tokens.add(new CapturingGroup(newToken));
+                break;
+            }
+            case 't': {
+                List<Token> newToken = new ArrayList<Token>();
+                newToken.add(new Literal("\t"));
+                tokens.add(new CapturingGroup(newToken));
+                break;
+            }
+            case 'w': {
+                Range range = new Range('A', 'Z');
+                List<Token> unfolded = range.unfold();
+                range = new Range('a', 'z');
+                unfolded.addAll(range.unfold());
+                range = new Range('0', '9');
+                unfolded.addAll(range.unfold());
+                unfolded.add(new Literal("_"));
+                tokens.add(new Alteration(unfolded));
+                break;
+            }
+            case 'W': {
+                Range range = new Range(0, 255);
+                List<Token> unfolded = range.unfold();
+                range = new Range('a', 'z');
+                unfolded.removeAll(range.unfold());
+                range = new Range('A', 'Z');
+                unfolded.removeAll(range.unfold());
+                range = new Range('0', '9');
+                unfolded.removeAll(range.unfold());
+                unfolded.remove(new Literal("_"));
+                tokens.add(new Alteration(unfolded));
+                break;
+            }
+            case 'a': {
+                Range range = new Range('a', 'z');
+                List<Token> unfolded = range.unfold();
+                range = new Range('A', 'Z');
+                unfolded.addAll(range.unfold());
+                tokens.add(new Alteration(unfolded));
+                break;
+            }
+            case 's': {
+                List<Token> unfolded = new ArrayList<Token>();
+                unfolded.add(new Literal(" "));
+                unfolded.add(new Literal("\t"));
+                tokens.add(new Alteration(unfolded));
+                break;
+            }
+            case 'd': {
+                Range range = new Range('0', '9');
+                List<Token> unfolded = range.unfold();
+                tokens.add(new Alteration(unfolded));
+                break;
+            }
+            case 'D': {
+                Range range = new Range(0, 255);
+                List<Token> unfolded = range.unfold();
+                range = new Range('0', '9');
+                unfolded.removeAll(range.unfold());
+                tokens.add(new Alteration(unfolded));
+                break;
+            }
+            case 'l': {
+                Range range = new Range('a', 'z');
+                List<Token> unfolded = range.unfold();
+                tokens.add(new Alteration(unfolded));
+                break;
+            }
+            case 'S': {
+                Range range = new Range(0, 255);
+                List<Token> unfolded = range.unfold();
+                unfolded.remove(new Literal(" "));
+                unfolded.remove(new Literal("\t"));
+                tokens.add(new Alteration(unfolded));
+                break;
+            }
+            case 'u': {
+                Range range = new Range('A', 'Z');
+                List<Token> unfolded = range.unfold();
+                tokens.add(new Alteration(unfolded));
+                break;
+            }
+            case 'x': {
+                Range range = new Range('A', 'F');
+                List<Token> unfolded = range.unfold();
+                range = new Range('a', 'f');
+                unfolded.addAll(range.unfold());
+                range = new Range('0', '9');
+                unfolded.addAll(range.unfold());
+                tokens.add(new Alteration(unfolded));
+                break;
+            }
+            default: {
+                tokens.add(new Literal(String.valueOf(s.charAt(i))));
             }
         }
         return tokens;

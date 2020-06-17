@@ -2,6 +2,8 @@ package re.fa;
 
 import java.util.*;
 
+import re.logger.Logger;
+
 public class StateTable {
     public List<List<List<Integer>>> stateTable = null;
     public List<String> transitionLiterals = null;
@@ -174,6 +176,10 @@ public class StateTable {
         for (int i = 0; i < metaFinalStates.size(); i++) {
             metaFinalStates.set(i, metaFinalStates.get(i) + n);
         }
+        // increase deleted
+        for (int i = 0; i < deleted.size(); i++) {
+            deleted.set(i, deleted.get(i) + n);
+        }
     }
 
     private void swapColumns(int index1, int index2) {
@@ -183,11 +189,13 @@ public class StateTable {
         transitionLiterals.set(index2, tempLit);
 
         // swap in table
-        stateTable.forEach(row -> {
+        List<List<Integer>> row;
+        for (int state = 0; state < stateTable.size(); state++) {
+            row = this.stateTable.get(state);
             List<Integer> tempTransition = row.get(index1);
             row.set(index1, row.get(index2));
             row.set(index2, tempTransition);
-        });
+        }
     }
 
     public void concatenateStateTable(StateTable table) {
@@ -218,6 +226,8 @@ public class StateTable {
         }
         // concatenate stateTable rows
         this.stateTable.addAll(correctedTable.stateTable);
+        // concatenate deleted
+        this.deleted.addAll(correctedTable.deleted);
         // this.startState remains
         // merge old finalState with old startState //
         int oldFinalState = this.finalState;
@@ -305,11 +315,38 @@ public class StateTable {
     public void mergeStates(int state1, int state2) {
         copyTransitions(state1, state2);
         replaceStateIndex(state2, state1);
-        removeState(state2);
+        removeStateNoReplace(state2);
+    }
+
+    private void mergeStatesOld(int state1, int state2) {
+        copyTransitions(state1, state2);
+        replaceStateIndex(state2, state1);
+        removeStateOld(state2);
     }
 
     public void setFinalState(int state) {
         finalState = state;
+    }
+
+    private void removeStateOld(int state) {
+        for (int s = state + 1; s < stateTable.size(); s++) {
+            replaceStateIndex(s, s - 1);
+        }
+        stateTable.remove(state);
+        if (metaFinalStates.indexOf(state) != -1) {
+            metaFinalStates.remove(metaFinalStates.indexOf(state));
+        }
+    }
+
+    private void removeStateNoReplace(int state) {
+        if (isDeleted(state)) {
+            throw new Error("State is already removed.");
+        }
+        deleted.add(state);
+        if (metaFinalStates.indexOf(state) != -1) {
+            metaFinalStatesNames.remove(metaFinalStates.indexOf(state));
+            metaFinalStates.remove(metaFinalStates.indexOf(state));
+        }
     }
 
     public void removeState(int state) {
@@ -397,5 +434,58 @@ public class StateTable {
             throw new Error("State is deleted.");
         }
         return stateTable.get(state).get(transLit).get(transition);
+    }
+
+    public void concatenateStateTableOld(StateTable table) {
+        // find new indexes for every state of table to avoid collisions
+        StateTable correctedTable = new StateTable(table);
+        correctedTable.increaseStateIndexes(this.stateTable.size());
+        // Add every missing lit from correctedTable to this
+        correctedTable.transitionLiterals.forEach(lit -> {
+            if (!this.transitionLiterals.contains(lit)) {
+                this.addTransitionLiteral(lit);
+            }
+        });
+        // Add every missing lit from this to correctedTable
+        this.transitionLiterals.forEach(lit -> {
+            if (!correctedTable.transitionLiterals.contains(lit)) {
+                correctedTable.addTransitionLiteral(lit);
+            }
+        });
+        // sort literal array and stateTable of correctedTable to correspond
+        // this.stateTable
+        int lit = 0;
+        while (lit < this.transitionLiterals.size()) {
+            while (!correctedTable.transitionLiterals.get(lit).equals(this.transitionLiterals.get(lit))) {
+                correctedTable.swapColumns(lit,
+                        correctedTable.transitionLiterals.indexOf(this.transitionLiterals.get(lit)));
+            }
+            lit++;
+        }
+        // concatenate stateTable rows
+        this.stateTable.addAll(correctedTable.stateTable);
+        // this.startState remains
+        // merge old finalState with old startState //
+        int oldFinalState = this.finalState;
+        this.finalState = correctedTable.getFinalState();
+        mergeStatesOld(oldFinalState, correctedTable.getStartState());
+    }
+
+    public void eraseDeleted() {
+        Logger.log("Erasing deleted...");
+        Collections.sort(deleted);
+        for (int i = deleted.size() - 1; i >= 0; i--) {
+            int state = deleted.get(i);
+            for (int s = state + 1; s < stateTable.size(); s++) {
+                replaceStateIndex(s, s - 1);
+            }
+            stateTable.remove(state);
+            if (metaFinalStates.indexOf(state) != -1) {
+                metaFinalStates.remove(metaFinalStates.indexOf(state));
+            }
+        }
+        deleted.clear();
+        Logger.log("Deleted erased. Table properties:");
+        Logger.log(Logger.extractProperties(this));
     }
 }

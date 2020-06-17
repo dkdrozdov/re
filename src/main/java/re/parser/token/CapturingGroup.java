@@ -1,5 +1,6 @@
 package re.parser.token;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import re.fa.StateTable;
@@ -13,6 +14,12 @@ public class CapturingGroup implements Token {
 
     public CapturingGroup(CapturingGroup group) {
         tokensGroup = group.getTokens();
+    }
+
+    public CapturingGroup(Token token) {
+        List<Token> tokens = new ArrayList<Token>();
+        tokens.add(token);
+        tokensGroup = tokens;
     }
 
     @Override
@@ -41,4 +48,5 @@ public class CapturingGroup implements Token {
     public int getPriority() {
         return TokenPriority.CAPTURING_GROUP.toInt();
     }
+
 }

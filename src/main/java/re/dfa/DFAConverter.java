@@ -6,21 +6,28 @@ import java.util.List;
 
 import re.fa.SpecialTransitions;
 import re.fa.StateTable;
+import re.logger.Logger;
 
 public class DFAConverter {
     public static StateTable convertToDFA(StateTable table) {
         StateTable DFATable;
-        table = removeDeadEnds(table);
-        table = removeUnobtainable(table);
+        // table = removeDeadEnds(table);
+        // table = removeUnreachable(table);
+        // Logger.log("States removed. Table properties:");
+        // Logger.log(Logger.extractProperties(table));
         DFATable = eliminateNonDeterminism(table);
+        Logger.log("Non-determinism eliminated. Table properties:");
+        Logger.log(Logger.extractProperties(table));
         DFATable = removeDeadEnds(DFATable);
-        DFATable = removeUnobtainable(DFATable);
+        DFATable = removeUnreachable(DFATable);
         DFATable = mergeEquivalent(DFATable);
         DFATable = completeTable(DFATable);
+        // DFATable.eraseDeleted();
         return DFATable;
     }
 
     public static StateTable completeTable(StateTable table) {
+        Logger.log("Completing table...");
         StateTable DFATable = new StateTable(table);
         DFATable.addFreeTransition(DFATable.getFinalState(), DFATable.getFinalState());
         DFATable = makeDeadState(DFATable);
@@ -45,12 +52,13 @@ public class DFAConverter {
     }
 
     public static StateTable mergeEquivalent(StateTable table) {
+        Logger.log("Merging equivalent...");
         StateTable DFATable = new StateTable(table);
         List<Integer> equivalentStates = findFirstEquivalent(DFATable);
         while (equivalentStates.size() != 0) {
             DFATable.mergeStates(equivalentStates.get(0), equivalentStates.get(1));
-            DFATable = removeDeadEnds(DFATable);
-            DFATable = removeUnobtainable(DFATable);
+            // DFATable = removeDeadEnds(DFATable);
+            // DFATable = removeUnobtainable(DFATable);
             equivalentStates.clear();
             equivalentStates = findFirstEquivalent(DFATable);
         }
@@ -129,7 +137,8 @@ public class DFAConverter {
         return false;
     }
 
-    public static StateTable removeUnobtainable(StateTable table) {
+    public static StateTable removeUnreachable(StateTable table) {
+        Logger.log("Removing unreachable states...");
         List<Integer> unobtainable = new ArrayList<Integer>();
         StateTable DFATable = new StateTable(table);
         for (int state : table.getRelevantStates()) {
@@ -145,6 +154,7 @@ public class DFAConverter {
     }
 
     public static StateTable removeDeadEnds(StateTable table) {
+        Logger.log("Removing dead-end states...");
         List<Integer> deadEnds = new ArrayList<Integer>();
         StateTable DFATable = new StateTable(table);
         for (int state : table.getRelevantStates()) {
@@ -197,6 +207,8 @@ public class DFAConverter {
     }
 
     public static StateTable eliminateNonDeterminism(StateTable table) {
+        Logger.log("Eliminating non-determinism...");
+        // (。_。)
         StateTable DFATable = new StateTable();
         DFATable.removeState(1);
         DFATable.removeState(0);
@@ -218,7 +230,7 @@ public class DFAConverter {
                 if (state == finalState) {
                     DFATable.setFinalState(handledStateLists.indexOf(states));
                 }
-                if (table.metaFinalStates.contains(state) && !(DFATable.metaFinalStates.contains(state))) {
+                if (table.metaFinalStates.contains(state)) {
                     DFATable.addMetaFinalState(handledStateLists.indexOf(states), table.getMetaFinalName(state));
                 }
             }
@@ -230,6 +242,7 @@ public class DFAConverter {
         List<String> currentStateLits = null;
         addAllUnique(handledStateLists, currentStates);
         currentStateLits = litsFromStates(table, currentStates);
+        Logger.log("New state added.");
         DFATable.addState();
         for (String lit : currentStateLits) {
             List<Integer> newStates = destinationByLitFromStates(table, currentStateLits, currentStates, lit);

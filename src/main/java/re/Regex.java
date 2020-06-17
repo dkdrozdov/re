@@ -8,6 +8,7 @@ import re.acceptor.Acceptor;
 import re.acceptor.Acceptor.AcceptorDecision;
 import re.dfa.DFAConverter;
 import re.fa.StateTable;
+import re.logger.Logger;
 import re.nfa.nfa_builder.NFABuilder;
 import re.parser.*;
 import re.parser.token.Token;
@@ -17,21 +18,33 @@ public class Regex {
 
     public static StateTable buildDFA(String regex) {
         List<Token> tokenArray = Parser.parse(regex);
+        Logger.log("Building tree...");
         Node<Token> treeRoot = Treebuilder.buildTree(tokenArray);
+        Logger.log("Building NFA...");
         StateTable table = NFABuilder.buildNFA(treeRoot);
+        // table.eraseDeleted();
+        Logger.log("Built a NFA. Table properties:");
+        Logger.log(Logger.extractProperties(table));
+        Logger.log("Converting to DFA...");
         table = DFAConverter.convertToDFA(table);
+        Logger.log("Built a DFA. Table properties:");
+        Logger.log(Logger.extractProperties(table));
         return table;
     }
 
     public static StateTable buildDFASystem(List<String> regexes, List<String> names) {
         List<StateTable> tables = new ArrayList<StateTable>();
         // convert regexes to NFA
+        Logger.log("Building NFAs...");
         for (String regex : regexes) {
             List<Token> tokenArray = Parser.parse(regex);
             Node<Token> treeRoot = Treebuilder.buildTree(tokenArray);
             tables.add(NFABuilder.buildNFA(treeRoot));
+            Logger.log("NFA built. Table properties:");
+            Logger.log(Logger.extractProperties(tables.get(tables.size() - 1)));
         }
         // connect regexes
+        Logger.log("Connecting NFAs...");
         StateTable keyring = new StateTable();
         int finalState = keyring.getFinalState();
         for (int i = 0; i < tables.size(); i++) {
@@ -44,8 +57,13 @@ public class Regex {
             keyring.addMetaFinalState(keyring.getFinalState(), names.get(i));
         }
         keyring.setFinalState(finalState);
+        Logger.log("NFAs connected. Table properties:");
+        Logger.log(Logger.extractProperties(keyring));
         // convert keyring to dfa
+        Logger.log("Converting to DFA...");
         StateTable DFATable = DFAConverter.convertToDFA(keyring);
+        Logger.log("DFA built. Table properties:");
+        Logger.log(Logger.extractProperties(DFATable));
         return DFATable;
     }
 
@@ -105,6 +123,32 @@ public class Regex {
         in.close();
     }
 
+    public static void ioStandardSystem() {
+        Scanner in = new Scanner(System.in);
+        // set up regex array and names
+        List<String> regexes = new ArrayList<String>();
+        List<String> names = new ArrayList<String>();
+        String regex = in.nextLine();
+        while (!regex.equals("exit")) {
+            // StateTable table = buildDFA(regex);
+            names.add(regex.substring(0, regex.indexOf(": ")));
+            regexes.add(regex.substring(regex.indexOf(": ") + 2, regex.length()));
+            regex = in.nextLine();
+        }
+        StateTable table = buildDFASystem(regexes, names);
+        // input string and get decision
+        String string = "";
+        List<List<String>> matched = new ArrayList<List<String>>();
+        string = in.nextLine();
+        while (!string.equals("exit")) {
+            matched = Acceptor.filter(table, string);
+            printMatched(matched);
+            System.out.println("\n");
+            string = in.nextLine();
+        }
+        in.close();
+    }
+
     public static void ioInteractiveSystem() {
         Scanner in = new Scanner(System.in);
         // set up regex array and names
@@ -147,6 +191,7 @@ public class Regex {
     }
 
     public static void main(String[] args) {
+        Logger.setLogLevel(0);
         ioInteractiveSystem();
     }
 }

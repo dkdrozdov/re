@@ -2,10 +2,8 @@ package re.fa;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Test;
-
 public class StateTableTests {
-    @Test
+    // @Test
     public void concatenateStateTableTest() {
         // set up table1
         StateTable table1 = new StateTable();
