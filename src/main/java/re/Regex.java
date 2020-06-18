@@ -25,10 +25,14 @@ public class Regex {
         // table.eraseDeleted();
         Logger.log("Built a NFA. Table properties:");
         Logger.log(Logger.extractProperties(table));
+        Logger.log("Table:");
+        Logger.log(Logger.extractTable(table));
         Logger.log("Converting to DFA...");
         table = DFAConverter.convertToDFA(table);
         Logger.log("Built a DFA. Table properties:");
         Logger.log(Logger.extractProperties(table));
+        Logger.log("Table:");
+        Logger.log(Logger.extractTable(table));
         return table;
     }
 
@@ -59,11 +63,15 @@ public class Regex {
         keyring.setFinalState(finalState);
         Logger.log("NFAs connected. Table properties:");
         Logger.log(Logger.extractProperties(keyring));
+        Logger.log("Table:");
+        Logger.log(Logger.extractTable(keyring));
         // convert keyring to dfa
         Logger.log("Converting to DFA...");
         StateTable DFATable = DFAConverter.convertToDFA(keyring);
         Logger.log("DFA built. Table properties:");
         Logger.log(Logger.extractProperties(DFATable));
+        Logger.log("Table:");
+        Logger.log(Logger.extractTable(keyring));
         return DFATable;
     }
 
@@ -191,7 +199,7 @@ public class Regex {
     }
 
     public static void main(String[] args) {
-        Logger.setLogLevel(0);
-        ioInteractiveSystem();
+        Logger.setLogLevel(1);
+        ioInteractive();
     }
 }
