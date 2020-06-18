@@ -57,9 +57,15 @@ public class Parser {
                 case '[': {
                     String passed = "";
                     i++;
-                    while (s.charAt(i) != ']' || s.substring(i - 1, i + 1).equals(backSlashS.concat("]"))) {
+                    boolean nearBackslash = false;
+                    while (s.charAt(i) != ']' || nearBackslash) {
                         passed = passed.concat(String.valueOf(s.charAt(i)));
                         i++;
+                        nearBackslash = s.substring(i - 1, i + 1).equals(backSlashS.concat("]"));
+                        if (s.length() > 1) {
+                            nearBackslash = nearBackslash
+                                    && !s.substring(i - 2, i).equals(backSlashS.concat(backSlashS));
+                        }
                     }
                     nextToken = new CapturingGroup((Token) new Alteration(parseNoConcat(passed)));
                     break;
@@ -73,9 +79,15 @@ public class Parser {
                 case '(': {
                     String passed = "";
                     i++;
-                    while (s.charAt(i) != ')') {
+                    boolean nearBackslash = false;
+                    while (s.charAt(i) != ')' || nearBackslash) {
                         passed = passed.concat(String.valueOf(s.charAt(i)));
                         i++;
+                        nearBackslash = s.substring(i - 1, i + 1).equals(backSlashS.concat("]"));
+                        if (s.length() > 1) {
+                            nearBackslash = nearBackslash
+                                    && !s.substring(i - 2, i).equals(backSlashS.concat(backSlashS));
+                        }
                     }
                     nextToken = new CapturingGroup(parse(passed));
                     break;
