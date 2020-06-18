@@ -6,7 +6,6 @@ import re.fa.SpecialTransitions;
 import re.parser.token.*;
 
 public class Parser {
-
     public static List<Token> parseNoConcat(String s) {
         List<Token> tokens = new ArrayList<Token>();
         Token nextToken;

@@ -46,8 +46,10 @@ public class Logger {
             extracted.set(row, extracted.get(row).concat(indent));
             if (lastLitLength < 8) {
                 indent = "\t";
-            } else if (lastLitLength < 16) {
+            } else if (lastLitLength <= 16) {
                 indent = "\t\t";
+            } else if (lastLitLength < 24) {
+                indent = "\t\t\t";
             }
             lastLitIndex = extracted.get(row).length();
             row++;
