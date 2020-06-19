@@ -71,7 +71,7 @@ public class Regex {
         Logger.log("DFA built. Table properties:");
         Logger.log(Logger.extractProperties(DFATable));
         Logger.log("Table:");
-        Logger.log(Logger.extractTable(keyring));
+        Logger.log(Logger.extractTable(DFATable));
         return DFATable;
     }
 
@@ -200,6 +200,6 @@ public class Regex {
 
     public static void main(String[] args) {
         Logger.setLogLevel(1);
-        ioInteractive();
+        ioInteractiveSystem();
     }
 }
